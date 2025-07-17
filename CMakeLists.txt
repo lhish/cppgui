@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(sdl_gui)
+set(CMAKE_CXX_STANDARD 23)
+set(SDLTTF_VENDORED ON)
+add_compile_options(-g -O0)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/SDL3" EXCLUDE_FROM_ALL)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/SDL3_ttf" EXCLUDE_FROM_ALL)
+add_executable(sdl_gui main.cpp)
+target_link_libraries(sdl_gui PRIVATE SDL3_ttf::SDL3_ttf SDL3::SDL3)

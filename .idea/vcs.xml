@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3_ttf" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3_ttf/external/freetype" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3_ttf/external/freetype/subprojects/dlg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3_ttf/external/harfbuzz" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3_ttf/external/plutosvg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3_ttf/external/plutosvg/plutovg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/SDL3_ttf/external/plutovg" vcs="Git" />
+  </component>
+</project>
