@@ -9,6 +9,12 @@
 #include <SDL3/SDL_main.h>
 #include"include/refl_s.h"
 #include <SDL3_ttf/SDL_ttf.h>
+#include <core/SkCanvas.h>
+#include <core/SkBitmap.h>
+#include <core/SkPaint.h>
+#include <core/SkTypeface.h>
+#include <core/SkFont.h>
+#include <codec/SkCodec.h>
 
 class Debug {
   public:
@@ -273,56 +279,6 @@ class Controller {
 
 auto &controller = Controller::GetInstance();
 
-int SDL_RenderFillCircle(const float x, const float y, const float radius, SDL_Color color) {
-  CheckSDL(SDL_SetRenderDrawColor(controller.renderer_, color.r, color.g, color.b, color.a));
-  int offset_x = 0;
-  int offset_y = radius - 1;
-  int d = radius - 2;
-  int status = 0;
-
-  while (offset_y >= offset_x) {
-    status += CheckSDL(SDL_RenderLine(controller.renderer_,
-                                      x - offset_y,
-                                      y + offset_x,
-                                      x + offset_y,
-                                      y + offset_x));
-    status += CheckSDL(SDL_RenderLine(controller.renderer_,
-                                      x - offset_x,
-                                      y + offset_y,
-                                      x + offset_x,
-                                      y + offset_y));
-    status += CheckSDL(SDL_RenderLine(controller.renderer_,
-                                      x - offset_x,
-                                      y - offset_y,
-                                      x + offset_x,
-                                      y - offset_y));
-    status += CheckSDL(SDL_RenderLine(controller.renderer_,
-                                      x - offset_y,
-                                      y - offset_x,
-                                      x + offset_y,
-                                      y - offset_x));
-
-    if (status < 0) {
-      status = -1;
-      break;
-    }
-
-    if (d >= 2 * offset_x) {
-      d -= 2 * offset_x + 1;
-      offset_x += 1;
-    } else if (d < 2 * (radius - offset_y)) {
-      d += 2 * offset_y - 1;
-      offset_y -= 1;
-    } else {
-      d += 2 * (offset_y - offset_x - 1);
-      offset_y -= 1;
-      offset_x += 1;
-    }
-  }
-
-  return status;
-}
-
 class Button : public UI {
   public:
     Button(const float x,
@@ -338,50 +294,7 @@ class Button : public UI {
     }
 
     void Draw(const float offset_x, const float offset_y, const float offset_zoom_rate) override {
-      CheckSDL(SDL_SetRenderDrawColor(controller.renderer_, color_.r, color_.g, color_.b, color_.a));
-      const auto &[width, height] = controller.GetWindowSize();
-      const float final_zoom = zoom_rate_ * offset_zoom_rate;
-      const float final_w = w_ * final_zoom;
-      const float final_h = h_ * final_zoom;
-      const float final_w_real = final_w * width;
-      const float final_h_real = final_h * height;
-      const float final_x = x_ + offset_x;
-      const float final_y = y_ + offset_y;
-      const float final_x_real = width * final_x;
-      const float final_y_real = height * final_y;
-      const float radius_real_length = radius_ratio_ / 2 * std::min(final_w_real, final_h_real) * final_zoom;
-      const float final_x_center_real = final_x_real + radius_real_length;
-      const float final_y_center_real = final_y_real + radius_real_length;
-      const float final_w_center_real = final_w_real - radius_real_length * 2;
-      const float final_h_center_real = final_h_real - radius_real_length * 2;
 
-      const SDL_FRect horizontal_center_rect{
-        final_x_real,
-        final_y_center_real,
-        final_w_real,
-        final_h_center_real,
-      };
-      CheckSDL(SDL_RenderFillRect(controller.renderer_, &horizontal_center_rect));
-      const SDL_FRect vertical_center_rect{
-        final_x_center_real,
-        final_y_real,
-        final_w_center_real,
-        final_h_real
-      };
-      CheckSDL(SDL_RenderFillRect(controller.renderer_, &vertical_center_rect));
-      CheckSDL(SDL_RenderFillCircle(final_x_center_real, final_y_center_real, radius_real_length, color_));
-      CheckSDL(SDL_RenderFillCircle(final_x_center_real + final_w_center_real,
-                                    final_y_center_real,
-                                    radius_real_length,
-                                    color_));
-      CheckSDL(SDL_RenderFillCircle(final_x_center_real,
-                                    final_y_center_real + final_h_center_real,
-                                    radius_real_length,
-                                    color_));
-      CheckSDL(SDL_RenderFillCircle(final_x_center_real + final_w_center_real,
-                                    final_y_center_real + final_h_center_real,
-                                    radius_real_length,
-                                    color_));
     }
 
   private:
@@ -396,7 +309,7 @@ class Button : public UI {
  * @return 程序的退出码。
  */
 int main(int argc, char *argv[]) {
-  controller.AddObject(std::make_unique<Button>(Button{0.1, 0.1, 0.5, 0.5, 1, {255, 0, 0, 255}, 0.5}));
-  controller.StartLoop();
+  // controller.AddObject(std::make_unique<Button>(Button{0.1, 0.1, 0.5, 0.5, 1, {255, 0, 0, 255}, 0.5}));
+  // controller.StartLoop();
   return 0;
 }
