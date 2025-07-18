@@ -13,7 +13,7 @@ endif ()
 set(SKIA_INCLUDE_DIR "${SKIA_BUILD_DIR}/../../")
 link_directories(${SKIA_BUILD_DIR})
 include_directories(${SKIA_INCLUDE_DIR})
-add_executable(sdl_gui test.cpp)
+add_executable(sdl_gui main.cpp)
 target_link_libraries(sdl_gui PRIVATE SDL3_ttf::SDL3_ttf SDL3::SDL3)
 target_link_libraries(sdl_gui PRIVATE
         # OpenGL 和 Vulkan 相关的库 (如果 Skia 使用了 GL 或 Vulkan)

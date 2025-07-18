@@ -101,25 +101,6 @@ static void handle_events(ApplicationState* state, SkCanvas* canvas) {
     }
 }
 
-// Creates a star type shape using a SkPath
-static SkPath create_star() {
-    static const int kNumPoints = 5;
-    SkPath concavePath;
-    SkPoint points[kNumPoints] = {{0, SkIntToScalar(-50)} };
-    SkMatrix rot;
-    // rot.setRotate(SkIntToScalar(360) / kNumPoints);
-    // for (int i = 1; i < kNumPoints; ++i) {
-        // rot.mapPoints(points + i, points + i - 1);
-    // }
-    concavePath.moveTo(points[0]);
-    for (int i = 0; i < kNumPoints; ++i) {
-        concavePath.lineTo(points[(2 * i) % kNumPoints]);
-    }
-    concavePath.setFillType(SkPathFillType::kEvenOdd);
-    concavePath.close();
-    return concavePath;
-}
-
 #if defined(SK_BUILD_FOR_ANDROID)
 int SDL_main(int argc, char** argv) {
 #else
@@ -154,9 +135,9 @@ int main(int argc, char** argv) {
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
     // If you want multisampling, uncomment the below lines and set a sample count
-    static const int kMsaaSampleCount = 0; //4;
-    // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, kMsaaSampleCount);
+    static const int kMsaaSampleCount = 4;
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, kMsaaSampleCount);
 
     /*
      * In a real application you might want to initialize more subsystems
@@ -263,7 +244,7 @@ int main(int argc, char** argv) {
                                                                     colorType, nullptr, &props));
 
     SkCanvas* canvas = surface->getCanvas();
-    canvas->scale((float)dw/dm->w, (float)dh/dm->h);
+    // canvas->scale((float)dw/dm->w, (float)dh/dm->h);
 
     ApplicationState state;
     state.window_width  = dw;
@@ -279,7 +260,6 @@ int main(int argc, char** argv) {
     SkCanvas* offscreen = cpuSurface->getCanvas();
     offscreen->save();
     offscreen->translate(50.0f, 50.0f);
-    offscreen->drawPath(create_star(), paint);
     offscreen->restore();
 
     sk_sp<SkImage> image = cpuSurface->makeImageSnapshot();
@@ -306,13 +286,6 @@ int main(int argc, char** argv) {
             canvas->drawRect(state.fRects[i], paint);
         }
         canvas->translate(0, -(dh - state.window_height));
-
-        // draw offscreen canvas
-        canvas->save();
-        canvas->translate(dm->w / 2.0, dm->h / 2.0);
-        canvas->rotate(rotation++);
-        canvas->drawImage(image, -50.0f, -50.0f);
-        canvas->restore();
 
         if (auto dContext = GrAsDirectContext(canvas->recordingContext())) {
             dContext->flushAndSubmit();
