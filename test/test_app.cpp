@@ -217,7 +217,6 @@ int main(int argc, char** argv) {
     SkColorType colorType;
 
     //SkDebugf("%s", SDL_GetPixelFormatName(windowFormat));
-    // TODO: the windowFormat is never any of these?
     if (SDL_PIXELFORMAT_RGBA8888 == windowFormat) {
         info.fFormat = GR_GL_RGBA8;
         colorType = kRGBA_8888_SkColorType;

@@ -1,0 +1,7 @@
+set(SKIA_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/skia_install/skia/out/Static_arm")
+if (NOT EXISTS "${SKIA_BUILD_DIR}/libskia.a")
+    message(FATAL_ERROR "Skia static libraries not found in ${SKIA_BUILD_DIR}. Please ensure Skia is built correctly for arm64.")
+endif ()
+set(SKIA_INCLUDE_DIR "${SKIA_BUILD_DIR}/../../")
+link_directories(${SKIA_BUILD_DIR})
+include_directories(${SKIA_INCLUDE_DIR})
