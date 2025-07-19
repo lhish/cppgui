@@ -1,7 +1,7 @@
 #include "sdl_gui/gui/controller.h"
 
 #include <variant>
-#include "../../common/include/sdl_gui/common/sdl_utils.h"
+#include "sdl_gui/common/sdl_utils.h"
 #include <include/gpu/ganesh/GrBackendSurface.h>
 #include <include/gpu/ganesh/GrDirectContext.h>
 #include <include/gpu/ganesh/GrRecordingContext.h>
