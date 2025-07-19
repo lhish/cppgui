@@ -6,19 +6,19 @@ UIRef::UIRef(std::vector<std::unique_ptr<UI> > &base_ui_vec,
 }
 
 UI &UIRef::operator*() const {
-  return *base_ui_vec_[index_];
+  return *base_ui_vec_.get()[index_];
 }
 
 UI *UIRef::operator->() const {
-  return base_ui_vec_[index_].get();
+  return base_ui_vec_.get()[index_].get();
 }
 
 UIRef::operator UI &() const {
-  return *base_ui_vec_[index_];
+  return *base_ui_vec_.get()[index_];
 }
 
 UIRef::operator bool() const {
-  return index_ < base_ui_vec_.size();
+  return index_ < base_ui_vec_.get().size();
 }
 
 bool operator==(const UIRef &lhs, const UIRef &rhs) {
@@ -30,8 +30,8 @@ bool operator!=(const UIRef &lhs, const UIRef &rhs) {
 }
 
 bool operator<(const UIRef &lhs, const UIRef &rhs) {
-  if (lhs.base_ui_vec_[lhs.index_]->depth_ != rhs.base_ui_vec_[rhs.index_]->depth_) {
-    return lhs.base_ui_vec_[lhs.index_]->depth_ < rhs.base_ui_vec_[rhs.index_]->depth_;
+  if (lhs.base_ui_vec_.get()[lhs.index_]->depth_ != rhs.base_ui_vec_.get()[rhs.index_]->depth_) {
+    return lhs.base_ui_vec_.get()[lhs.index_]->depth_ < rhs.base_ui_vec_.get()[rhs.index_]->depth_;
   }
   return lhs.index_ < rhs.index_;
 }

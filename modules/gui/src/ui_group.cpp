@@ -4,29 +4,26 @@
 
 #include "sdl_gui/gui/controller.h"
 
-UIGroup::UIGroup(const float x,
-                 const float y_ratio,
-                 const float w,
-                 const float h_ratio,
+UIGroup::UIGroup(const UIAttributes &attr,
                  const int depth,
-                 const std::set<UIRef> &ui_group) : UI(x, y_ratio, w, h_ratio, depth),
+                 const std::set<UIRef> &ui_group) : UI(attr, depth),
                                                     ui_group_(ui_group) {
 }
 
-void UIGroup::Draw(const float offset_x, const float offset_y, const float offset_zoom_rate) {
-  const float final_zoom_rate = offset_zoom_rate * zoom_rate_;
+void UIGroup::Draw(const UIAttributes &offset) {
+  const auto real = Controller::CalReal(offset, attr_);
 #ifdef DEBUG
   static SkRandom rand;
   static auto color_here = rand.nextU() | 0x44808080;
-  controller.DrawRect(x_ * final_zoom_rate + offset_x,
-                      x_ * y_ratio_ * final_zoom_rate + offset_y,
-                      final_zoom_rate * w_,
-                      final_zoom_rate * w_ * h_ratio_,
-                      Controller::SkColorToSDLColor(color_here));
+  controller.DrawRect(real.x_, real.y_, real.w_, real.h_, Controller::SkColorToSDLColor(color_here));
 #endif
   for (auto &ui : ui_group_) {
-    ui->Draw(x_ * final_zoom_rate + offset_x, x_ * y_ratio_ * final_zoom_rate + offset_y, final_zoom_rate);
+    ui->Draw(real);
   }
+}
+
+void UIGroup::AddObject(const UIRef &ref) {
+  ui_group_.emplace(ref);
 }
 
 UIGroup::~UIGroup() = default;

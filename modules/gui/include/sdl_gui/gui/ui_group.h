@@ -7,24 +7,16 @@
 
 class UIGroup : public UI {
   public:
-    UIGroup(float x,
-            float y_ratio,
-            float w,
-            float h_ratio,
+    UIGroup(const UIAttributes &attr,
             int depth,
             const std::set<UIRef> &ui_group);
 
-    void Draw(float offset_x, float offset_y, float offset_zoom_rate) override;
+    void Draw(const UIAttributes &offset) override;
 
-    template<typename... Args>
-    void AddObject(Args &&... args);
+    void AddObject(const UIRef &ref) override;
 
     ~UIGroup() override;
 
     std::set<UIRef> ui_group_;
 };
-template<typename... Args>
-void UIGroup::AddObject(Args &&... args) {
-  ui_group_.emplace(std::forward<Args>(args)...);
-}
 #endif //SDL_GUI_UIGROUP_H

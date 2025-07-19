@@ -2,6 +2,7 @@
 #define SDL_GUI_DEBUG_H
 
 #include <iostream>
+#define assertm(exp, msg) assert((void(msg), exp))
 
 class Debug {
   public:

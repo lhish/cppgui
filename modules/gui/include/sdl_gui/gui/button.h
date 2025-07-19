@@ -2,20 +2,17 @@
 #define SDL_GUI_BUTTON_H
 
 #include <SDL3/SDL.h>
-#include "ui.h"
+#include "ui_group.h"
 
-class Button : public UI {
+class Button : public UIGroup {
   public:
-    Button(float x,
-           float y_ratio,
-           float w,
-           float h_ratio,
+    Button(const UIAttributes &attr,
            int depth,
            const SDL_Color &color,
            float radius_ratio
     );
 
-    void Draw(float offset_x, float offset_y, float offset_zoom_rate) override;
+    void Draw(const UIAttributes &offset) override;
 
   private:
     SDL_Color color_{255, 0, 0, 255};

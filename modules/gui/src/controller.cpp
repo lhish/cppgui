@@ -1,5 +1,6 @@
 #include "sdl_gui/gui/controller.h"
 
+#include <cassert>
 #include <variant>
 #include "sdl_gui/common/sdl_utils.h"
 #include <include/gpu/ganesh/GrBackendSurface.h>
@@ -48,10 +49,10 @@ void Controller::handle_events() {
   }
 }
 
-void Controller::Draw() {
+void Controller::Draw() const {
   canvas_->clear(SK_ColorWHITE);
   canvas_->translate(0, static_cast<float>(ori_height_ - height_));
-  basic_ui_.Draw(0, 0, 1);
+  (*basic_ui_)->Draw({0, 0, 1, static_cast<float>(height_) / static_cast<float>(width_), 1});
   canvas_->translate(0, static_cast<float>(-(ori_height_ - height_)));
 }
 
@@ -72,9 +73,34 @@ Controller::~Controller() {
   SDL_Quit();
 }
 
-void Controller::AddObject(std::unique_ptr<UI> ui) {
+UIAttributes Controller::CalReal(const UIAttributes &offset, const UIAttributes &self) {
+  const auto final_zoom_rate = offset.zoom_rate_ * self.zoom_rate_;
+  const auto x_real = self.x_ * final_zoom_rate + offset.x_;
+  const auto y_real = self.y_ >= 0
+                        ? self.y_ * final_zoom_rate + offset.y_
+                        : offset.h_ + self.y_ * final_zoom_rate + offset.y_; //<0代表以左下为原点
+  const auto w_real = self.w_ * final_zoom_rate;
+  const auto h_real = self.h_ != -1 //-1代表一直延伸到底部
+                        ? self.w_ * self.h_ * final_zoom_rate
+                        : self.y_ >= 0
+                            ? offset.h_ - self.y_ * final_zoom_rate
+                            : -self.y_ * final_zoom_rate;
+
+  return {
+    x_real, y_real, w_real,
+    h_real, final_zoom_rate
+  };
+}
+
+UIRef Controller::AddObject(std::unique_ptr<UI> ui, const std::optional<std::reference_wrapper<UIRef> > parent) {
   ui_group_.emplace_back(std::move(ui));
-  basic_ui_.AddObject(ui_group_, ui_group_.end() - 1);
+  UIRef ref{ui_group_, ui_group_.end() - 1};
+  if (!parent) {
+    (*basic_ui_)->AddObject(ref);
+  } else {
+    parent->get()->AddObject(ref);
+  }
+  return ref;
 }
 
 SDL_Color Controller::SkColorToSDLColor(const SkColor &color) {
@@ -203,4 +229,6 @@ Controller::Controller() {
 
   canvas_ = (*surface_)->getCanvas();
   paint_.setAntiAlias(true);
+  ui_group_.emplace_back(std::move(std::make_unique<UIGroup>(UIAttributes{0, 0, 1, -1}, 0, std::set<UIRef>{})));
+  basic_ui_ = {ui_group_, ui_group_.end() - 1};
 }

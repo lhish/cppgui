@@ -3,7 +3,6 @@
 
 #include <SDL3/SDL.h>
 #include <memory>
-#include <variant>
 #include <vector>
 
 #include <include/core/SkCanvas.h>
@@ -20,13 +19,15 @@ class Controller {
 
     void handle_events();
 
-    void Draw();
+    void Draw() const;
 
     void StartLoop();
 
     ~Controller();
 
-    void AddObject(std::unique_ptr<UI> ui);
+    [[nodiscard]] static UIAttributes CalReal(const UIAttributes &offset, const UIAttributes &self);
+
+    UIRef AddObject(std::unique_ptr<UI> ui, std::optional<std::reference_wrapper<UIRef> > parent = {});
 
     static SDL_Color SkColorToSDLColor(const SkColor &color);
 
@@ -48,7 +49,7 @@ class Controller {
     SkCanvas *canvas_;
     SDL_Event event_{};
     SDL_Window *window_;
-    UIGroup basic_ui_{0, 1, 1, 9.0 / 16, 0, {}};
+    std::optional<UIRef> basic_ui_{};
     bool keep_going{true};
     std::vector<std::unique_ptr<UI> > ui_group_{};
     int width_;
