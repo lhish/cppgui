@@ -8,9 +8,9 @@
 class UIGroup : public UI {
   public:
     UIGroup(float x,
-            float y,
+            float y_ratio,
             float w,
-            float h,
+            float h_ratio,
             int depth,
             const std::set<UIRef> &ui_group);
 

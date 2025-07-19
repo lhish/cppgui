@@ -4,8 +4,10 @@ cmake_policy(VERSION 3.16)
 project(sdl_gui)
 
 set(CMAKE_CXX_STANDARD 23)
-
-add_compile_options(-g -O0)
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    add_compile_definitions(DEBUG)
+    add_compile_options(-g -O0)
+endif ()
 
 set(SDLTTF_VENDORED ON)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/SDL3" EXCLUDE_FROM_ALL)

@@ -1,4 +1,4 @@
-#include "../include/sdl_gui/ui_ref.h"
+#include "sdl_gui/gui/ui_ref.h"
 
 UIRef::UIRef(std::vector<std::unique_ptr<UI> > &base_ui_vec,
              const std::vector<std::unique_ptr<UI> >::iterator it) : base_ui_vec_(base_ui_vec),

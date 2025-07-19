@@ -1,13 +1,10 @@
-#include "../include/sdl_gui/ui.h"
+#include "sdl_gui/gui/ui.h"
 
-UI::UI(const float x, const float y, const float w, const float h, const int depth)
+UI::UI(const float x, const float y_ratio, const float w, const float h_ratio, const int depth)
   : x_(x),
-    y_(y),
+    y_ratio_(y_ratio),
     w_(w),
-    h_(h), depth_(depth) {
-}
-
-void UI::Draw(float offset_x, float offset_y, float offset_zoom_rate) {
+    h_ratio_(h_ratio), depth_(depth) {
 }
 
 void UI::Click() {

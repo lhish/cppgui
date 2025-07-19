@@ -7,12 +7,13 @@
 class Button : public UI {
   public:
     Button(float x,
-           float y,
+           float y_ratio,
            float w,
-           float h,
+           float h_ratio,
            int depth,
            const SDL_Color &color,
-           float radius_ratio);
+           float radius_ratio
+    );
 
     void Draw(float offset_x, float offset_y, float offset_zoom_rate) override;
 

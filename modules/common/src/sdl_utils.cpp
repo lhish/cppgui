@@ -1,4 +1,4 @@
-#include "../include/sdl_gui/sdl_utils.h"
+#include "sdl_gui/common/sdl_utils.h"
 #include <SDL3/SDL.h>
 #include <source_location>
 #include <sstream>

@@ -1,5 +1,7 @@
-#include "../include/sdl_gui/controller.h"
-#include "../../common/include/sdl_gui/sdl_utils.h"
+#include "sdl_gui/gui/controller.h"
+
+#include <variant>
+#include "../../common/include/sdl_gui/common/sdl_utils.h"
 #include <include/gpu/ganesh/GrBackendSurface.h>
 #include <include/gpu/ganesh/GrDirectContext.h>
 #include <include/gpu/ganesh/GrRecordingContext.h>
@@ -9,6 +11,8 @@
 #include <include/gpu/ganesh/gl/GrGLInterface.h>
 #include <src/gpu/ganesh/gl/GrGLUtil.h>
 #include <include/core/SkColorSpace.h>
+#include <include/core/SkRRect.h>
+
 #include "SDL3/SDL_opengl.h"
 
 Controller &Controller::GetInstance() {
@@ -47,6 +51,7 @@ void Controller::handle_events() {
 void Controller::Draw() {
   canvas_->clear(SK_ColorWHITE);
   canvas_->translate(0, static_cast<float>(ori_height_ - height_));
+  basic_ui_.Draw(0, 0, 1);
   canvas_->translate(0, static_cast<float>(-(ori_height_ - height_)));
 }
 
@@ -70,6 +75,45 @@ Controller::~Controller() {
 void Controller::AddObject(std::unique_ptr<UI> ui) {
   ui_group_.emplace_back(std::move(ui));
   basic_ui_.AddObject(ui_group_, ui_group_.end() - 1);
+}
+
+SDL_Color Controller::SkColorToSDLColor(const SkColor &color) {
+  return SDL_Color(SkColorGetR(color),SkColorGetG(color),SkColorGetB(color),SkColorGetA(color));
+}
+
+void Controller::SetColor(const SDL_Color &color) {
+  paint_.setColor(SkColorSetARGB(color.a, color.r, color.g, color.b));
+}
+
+
+void Controller::DrawRect(const float x,
+                          const float y,
+                          const float w,
+                          const float h,
+                          const SDL_Color &color) {
+  SetColor(color);
+  canvas_->drawRect(SkRect::MakeXYWH(SkIntToScalar(x*width_),
+                                     SkIntToScalar(y*width_),
+                                     SkIntToScalar(w*width_),
+                                     SkIntToScalar(h*width_)),
+                    paint_);
+}
+
+void Controller::DrawRRect(const float x,
+                           const float y,
+                           const float w,
+                           const float h,
+                           const SDL_Color &color,
+                           const float radius_ratio) {
+  SetColor(color);
+  const float corner_radius = std::min(w, h) * radius_ratio * static_cast<float>(width_) / 2;
+  canvas_->drawRRect(SkRRect::MakeRectXY(SkRect::MakeXYWH(SkIntToScalar(x*width_),
+                                                          SkIntToScalar(y*width_),
+                                                          SkIntToScalar(w*width_),
+                                                          SkIntToScalar(h*width_)),
+                                         corner_radius,
+                                         corner_radius),
+                     paint_);
 }
 
 Controller::Controller() {
@@ -158,4 +202,5 @@ Controller::Controller() {
     &props));
 
   canvas_ = (*surface_)->getCanvas();
+  paint_.setAntiAlias(true);
 }

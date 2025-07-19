@@ -1,1 +1,1 @@
-#include "../include/sdl_gui/debug.h"
+#include "sdl_gui/common/debug.h"
