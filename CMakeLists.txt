@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 23)
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
     add_compile_definitions(DEBUG)
     add_compile_options(-g -O0)
+else ()
+    add_compile_options(-g -O0)
 endif ()
 
 set(SDLTTF_VENDORED ON)

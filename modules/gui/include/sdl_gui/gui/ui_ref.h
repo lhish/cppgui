@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <memory>
-#include "ui.h"
+#include <optional>
+
+class UI;
 
 class UIRef {
   public:
@@ -16,6 +18,8 @@ class UIRef {
       : base_ui_vec_(other.base_ui_vec_),
         index_(other.index_) {
     }
+
+    UIRef() = default;
 
     UIRef &operator=(const UIRef &other) {
       if (this == &other)
@@ -54,8 +58,8 @@ class UIRef {
     friend bool operator>=(const UIRef &lhs, const UIRef &rhs);
 
   private:
-    std::reference_wrapper<std::vector<std::unique_ptr<UI> > > base_ui_vec_;
-    size_t index_;
+    std::optional<std::reference_wrapper<std::vector<std::unique_ptr<UI> > > > base_ui_vec_{};
+    size_t index_{};
 };
 
 #endif //SDL_GUI_UI_REF_H

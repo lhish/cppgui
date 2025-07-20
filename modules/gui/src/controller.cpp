@@ -15,6 +15,8 @@
 #include <include/core/SkRRect.h>
 
 #include "SDL3/SDL_opengl.h"
+#include "sdl_gui/common/magic_enum.hpp"
+#include "sdl_gui/gui/ui_group.h"
 
 Controller &Controller::GetInstance() {
   static Controller controller;
@@ -40,11 +42,39 @@ void Controller::handle_events() {
         }
         break;
       }
+      case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+        mouse_down_ = event.button.button == SDL_BUTTON_LEFT
+                        ? MouseStatus::MOUSE_LEFT_DOWN
+                        : MouseStatus::MOUSE_RIGHT_DOWN;
+        break;
+      }
+      case SDL_EVENT_MOUSE_BUTTON_UP: {
+        mouse_down_ = mouse_down_ == MouseStatus::MOUSE_LEFT_DOWN || mouse_down_ == MouseStatus::MOUSE_LEFT_MOVE
+                        ? MouseStatus::MOUSE_LEFT_UP
+                        : MouseStatus::MOUSE_RIGHT_UP;
+        break;
+      }
+      case SDL_EVENT_MOUSE_MOTION: {
+        if (mouse_down_ == MouseStatus::MOUSE_LEFT_DOWN || mouse_down_ == MouseStatus::MOUSE_LEFT_MOVE) {
+          mouse_down_ = MouseStatus::MOUSE_LEFT_MOVE;
+        } else if (mouse_down_ == MouseStatus::MOUSE_RIGHT_DOWN || mouse_down_ == MouseStatus::MOUSE_RIGHT_MOVE) {
+          mouse_down_ = MouseStatus::MOUSE_RIGHT_MOVE;
+        } else {
+          mouse_down_ = MouseStatus::MOUSE_MOVE;
+        }
+        break;
+      }
       case SDL_EVENT_QUIT:
         keep_going = false;
         break;
       default:
+        if (mouse_down_ == MouseStatus::MOUSE_MOVE) {
+          mouse_down_ = MouseStatus::IDLE;
+        }
         break;
+    }
+    if (mouse_down_ != MouseStatus::IDLE) {
+      hover_checker_.Solve(event.button.x, event.button.y, mouse_down_);
     }
   }
 }
@@ -57,8 +87,11 @@ void Controller::Draw() const {
 }
 
 void Controller::StartLoop() {
+  FPSTimer timer;
   while (keep_going) {
+    // timer.Tick();
     handle_events();
+    hover_checker_.Clear();
     Draw();
     if (auto dContext = GrAsDirectContext(canvas_->recordingContext())) {
       dContext->flushAndSubmit();
@@ -73,7 +106,7 @@ Controller::~Controller() {
   SDL_Quit();
 }
 
-UIAttributes Controller::CalReal(const UIAttributes &offset, const UIAttributes &self) {
+std::optional<UIAttributes> Controller::CalReal(const UIAttributes &offset, const UIAttributes &self) const {
   const auto final_zoom_rate = offset.zoom_rate_ * self.zoom_rate_;
   const auto x_real = self.x_ * final_zoom_rate + offset.x_;
   const auto y_real = self.y_ >= 0
@@ -85,16 +118,31 @@ UIAttributes Controller::CalReal(const UIAttributes &offset, const UIAttributes 
                         : self.y_ >= 0
                             ? offset.h_ - self.y_ * final_zoom_rate
                             : -self.y_ * final_zoom_rate;
-
+  if (CheckRange(x_real, y_real) && CheckRange(x_real, y_real + h_real) && CheckRange(x_real + w_real, h_real) &&
+      CheckRange(x_real + w_real, y_real + h_real)) {
+    return {};
+  }
   return {
-    x_real, y_real, w_real,
-    h_real, final_zoom_rate
+    {
+      x_real, y_real, w_real,
+      h_real, final_zoom_rate
+    }
   };
 }
 
+bool Controller::CheckRange(float x, float y) const {
+  return x < 0 || x > 1 || y < 0 || y > static_cast<float>(height_) / static_cast<float>(width_);
+}
+
+void Controller::AddTrigger(const UITriggerRef &trigger_ref) {
+  hover_checker_.Add(trigger_ref);
+}
+
 UIRef Controller::AddObject(std::unique_ptr<UI> ui, const std::optional<std::reference_wrapper<UIRef> > parent) {
+  ui->depth_ += (parent ? parent->get() : *basic_ui_)->depth_ + 1;
   ui_group_.emplace_back(std::move(ui));
   UIRef ref{ui_group_, ui_group_.end() - 1};
+  ui_group_.back()->SetUIRef(ref);
   if (!parent) {
     (*basic_ui_)->AddObject(ref);
   } else {
@@ -229,6 +277,6 @@ Controller::Controller() {
 
   canvas_ = (*surface_)->getCanvas();
   paint_.setAntiAlias(true);
-  ui_group_.emplace_back(std::move(std::make_unique<UIGroup>(UIAttributes{0, 0, 1, -1}, 0, std::set<UIRef>{})));
+  ui_group_.emplace_back(std::move(std::make_unique<UIGroup>(UIAttributes{0, 0, 1, -1}, "root")));
   basic_ui_ = {ui_group_, ui_group_.end() - 1};
 }

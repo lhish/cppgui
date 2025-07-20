@@ -7,9 +7,10 @@
 class Button : public UIGroup {
   public:
     Button(const UIAttributes &attr,
-           int depth,
+           std::string name,
            const SDL_Color &color,
-           float radius_ratio
+           float radius_ratio,
+           int depth = 0
     );
 
     void Draw(const UIAttributes &offset) override;

@@ -8,14 +8,15 @@ find_library(CORE_GRAPHICS_LIB NAMES CoreGraphics PATHS /System/Library/Framewor
 find_library(CORE_TEXT_LIB NAMES CoreText PATHS /System/Library/Frameworks)
 find_library(OPENGL_LIB NAMES OpenGL PATHS /System/Library/Frameworks)
 find_library(FOUNDATION_LIB NAMES Foundation PATHS /System/Library/Frameworks)
+find_package(Glog REQUIRED QUIET)
 
 target_include_directories(
-  ${LIB}
-  PUBLIC include
+        ${LIB}
+        PUBLIC include ${GLOG_INCLUDE_DIRS}
 )
 
 target_link_libraries(
-  ${LIB}
+        ${LIB}
         PUBLIC
         skia
         skshaper
@@ -30,4 +31,5 @@ target_link_libraries(
         ${OPENGL_LIB}
         ${FOUNDATION_LIB}
         SDL3_ttf::SDL3_ttf SDL3::SDL3
+        glog::glog
 )

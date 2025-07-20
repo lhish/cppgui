@@ -2,9 +2,8 @@
 #define SDL_GUI_UI_H
 #include <cassert>
 
+#include "ui_ref.h"
 #include "sdl_gui/common/debug.h"
-
-class UIRef;
 
 struct UIAttributes {
   float x_{}; //0-1 x_*width
@@ -16,22 +15,27 @@ struct UIAttributes {
 
 class UI {
   friend class UIRef;
+  friend class Controller;
 
   friend bool operator<(const UIRef &lhs, const UIRef &rhs);
 
   public:
     virtual ~UI() = default;
 
-    explicit UI() = default;
-
-    UI(UIAttributes attr, int depth);
+    UI(const UIAttributes &attr, std::string name, int depth);
 
     virtual void Draw(const UIAttributes &offset) {
+    }
+
+    [[nodiscard]] std::string getname() const {
+      return name_;
     }
 
     virtual void AddObject(const UIRef &ref) { assertm(false, "only basic ui can't be as parent"); }
 
     virtual void Click();
+
+    void SetUIRef(const UIRef &ref);
 
     friend bool operator==(const UI &lhs, const UI &rhs);
 
@@ -48,6 +52,8 @@ class UI {
   protected:
     UIAttributes attr_{};
     int depth_{}; //>=0
+    UIRef ref_{};
+    std::string name_;
 };
 
 #endif //SDL_GUI_UI_H

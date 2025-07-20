@@ -8,8 +8,9 @@
 class UIGroup : public UI {
   public:
     UIGroup(const UIAttributes &attr,
-            int depth,
-            const std::set<UIRef> &ui_group);
+            std::string name,
+            int depth = 0,
+            const std::set<UIRef> &ui_group = {});
 
     void Draw(const UIAttributes &offset) override;
 

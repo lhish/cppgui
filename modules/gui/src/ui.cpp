@@ -1,9 +1,16 @@
+#include <utility>
+
 #include "sdl_gui/gui/ui.h"
 
-UI::UI(UIAttributes attr, int depth): attr_(attr), depth_(depth) {
+UI::UI(const UIAttributes &attr, std::string name, const int depth): attr_(attr), depth_(depth),
+                                                                     name_(std::move(name)) {
 }
 
 void UI::Click() {
+}
+
+void UI::SetUIRef(const UIRef &ref) {
+  ref_ = ref;
 }
 
 bool operator==(const UI &lhs, const UI &rhs) {

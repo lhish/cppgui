@@ -9,9 +9,13 @@
 #include <include/core/SkColor.h>
 #include <include/core/SkSurface.h>
 #include <include/core/SkPaint.h>
+#include <include/gpu/ganesh/gl/GrGLInterface.h>
+#include <include/gpu/ganesh/gl/GrGLTypes.h>
 
+#include "events.h"
+#include "hover_checker.h"
 #include "ui.h"
-#include "ui_group.h"
+
 
 class Controller {
   public:
@@ -25,7 +29,11 @@ class Controller {
 
     ~Controller();
 
-    [[nodiscard]] static UIAttributes CalReal(const UIAttributes &offset, const UIAttributes &self);
+    [[nodiscard]] std::optional<UIAttributes> CalReal(const UIAttributes &offset, const UIAttributes &self) const;
+
+    [[nodiscard]] bool CheckRange(float x, float y) const;
+
+    void AddTrigger(const UITriggerRef &trigger_ref);
 
     UIRef AddObject(std::unique_ptr<UI> ui, std::optional<std::reference_wrapper<UIRef> > parent = {});
 
@@ -60,6 +68,8 @@ class Controller {
     const SDL_DisplayMode *dm_;
     SkPaint paint_{};
     std::unique_ptr<sk_sp<SkSurface> > surface_;
+    HoverChecker hover_checker_;
+    MouseStatus mouse_down_{MouseStatus::IDLE};
 };
 
 inline auto &controller = Controller::GetInstance();
