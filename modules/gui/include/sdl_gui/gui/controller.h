@@ -28,7 +28,7 @@ class Controller {
 
     void StartLoop(
 #ifdef DEBUG
-      const std::optional<std::function<void()> > &debug_draw
+      const std::optional<std::function<void()> > &debug_draw = {}
 #endif
     );
 
@@ -56,7 +56,7 @@ class Controller {
                          float h,
                          const SDL_Color &color,
                          float radius,
-                         ShadowHeights elevation);
+                         float elevation);
 
     [[nodiscard]] int GetWidth() const { return width_; }
 

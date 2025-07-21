@@ -59,7 +59,7 @@ void Button::Draw(const UIAttributes &offset) {
       }
     }
   });
-  controller.DrawRRectShadow(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_, ShadowHeights::d4);
+  controller.DrawRRectShadow(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_, height_ + 8);
   controller.DrawRRect(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_);
   UIGroup::Draw(offset);
 }

@@ -199,18 +199,34 @@ void Controller::DrawRRectShadow(const float x,
                                  const float h,
                                  const SDL_Color &color,
                                  const float radius,
-                                 ShadowHeights elevation) {
+                                 const float elevation) {
+  assertm(elevation>=0&&elevation<24, "elevation out of range");
   const float real_x = x * static_cast<float>(width_);
   const float real_y = y * static_cast<float>(width_);
   const float real_w = w * static_cast<float>(width_);
   const float real_h = h * static_cast<float>(width_);
   const float corner_radius = std::min(w, h) * radius * static_cast<float>(width_) / 2;
-  const float ratio = static_cast<float>(width_) / 1280;
+  const float ratio = static_cast<float>(width_) / 2540;
+  std::optional<std::reference_wrapper<const decltype(shadow_properties_map)::value_type> > before, after;
+  for (auto &each_shadow_properties : shadow_properties_map) {
+    if (each_shadow_properties.first <= elevation) {
+      before = each_shadow_properties;
+    }
+    if (!after && each_shadow_properties.first > elevation) {
+      after = each_shadow_properties;
+      break;
+    }
+  }
+  const float shadow_ratio = 1 - (elevation - before->get().first) / (after->get().first - before->get().first);
+  ShadowProperties final_shadow_properties{
+    before->get().second * shadow_ratio + after->get().second * (1 - shadow_ratio)
+  };
+
   for (auto [offset_y, radius_ratio, extend, alpha] :
-       std::ranges::reverse_view(shadow_properties_map[elevation].layer)) {
+       final_shadow_properties.layer) {
     paint_.setAntiAlias(true);
     paint_.setColor(SkColorSetARGB(static_cast<int>(alpha * 255), 0, 0, 0));
-    paint_.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, radius_ratio * ratio / 1.3f, true));
+    paint_.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, radius_ratio * ratio, true));
     canvas_->save();
     canvas_->clipRRect(
       SkRRect::MakeRectXY(SkRect::MakeXYWH(real_x, real_y, real_w, real_h), corner_radius, corner_radius),
@@ -218,7 +234,7 @@ void Controller::DrawRRectShadow(const float x,
       true);
     canvas_->drawRRect(SkRRect::MakeRectXY(
                          SkRect::MakeXYWH(real_x - extend * ratio,
-                                          real_y - extend * ratio + offset_y * ratio * 1.5f,
+                                          real_y - extend * ratio + offset_y * ratio,
                                           real_w + extend * ratio * 2,
                                           real_h + extend * ratio * 2),
                          corner_radius,
