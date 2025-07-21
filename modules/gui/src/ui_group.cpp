@@ -19,7 +19,7 @@ void UIGroup::Draw(const UIAttributes &offset) {
 #ifdef DEBUG
   static SkRandom rand;
   static auto color_here = rand.nextU() | 0x44808080;
-  controller.DrawRect(real->x_, real->y_, real->w_, real->h_, Controller::SkColorToSDLColor(color_here));
+  // controller.DrawRect(real->x_, real->y_, real->w_, real->h_, Controller::SkColorToSDLColor(color_here));
 #endif
   for (auto &ui : ui_group_) {
     ui->Draw(*real);

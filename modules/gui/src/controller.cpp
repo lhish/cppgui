@@ -1,6 +1,9 @@
 #include "sdl_gui/gui/controller.h"
+#include "sdl_gui/gui/controller.h"
+#include "sdl_gui/gui/controller.h"
 
 #include <cassert>
+#include <ranges>
 #include <variant>
 #include "sdl_gui/common/sdl_utils.h"
 #include <include/gpu/ganesh/GrBackendSurface.h>
@@ -13,6 +16,7 @@
 #include <src/gpu/ganesh/gl/GrGLUtil.h>
 #include <include/core/SkColorSpace.h>
 #include <include/core/SkRRect.h>
+#include <include/effects/SkBlurMaskFilter.h>
 
 #include "SDL3/SDL_opengl.h"
 #include "sdl_gui/common/magic_enum.hpp"
@@ -33,6 +37,7 @@ void Controller::handle_events() {
             event.window.type == SDL_EVENT_WINDOW_RESIZED) {
           width_ = event.window.data1;
           height_ = event.window.data2;
+          LOG(INFO) << "Window resize: " << width_ << " " << height_ << std::endl;
         }
         break;
       case SDL_EVENT_KEY_DOWN: {
@@ -86,13 +91,28 @@ void Controller::Draw() const {
   canvas_->translate(0, static_cast<float>(-(ori_height_ - height_)));
 }
 
-void Controller::StartLoop() {
+void Controller::StartLoop(
+#ifdef DEBUG
+  const std::optional<std::function<void()> > &debug_draw
+#endif
+) {
   FPSTimer timer;
   while (keep_going) {
     // timer.Tick();
     handle_events();
     hover_checker_.Clear();
-    Draw();
+#ifdef DEBUG
+    if (debug_draw) {
+      canvas_->clear(SK_ColorWHITE);
+      canvas_->translate(0, static_cast<float>(ori_height_ - height_));
+      (*debug_draw)();
+      canvas_->translate(0, static_cast<float>(-(ori_height_ - height_)));
+    } else {
+#endif
+      Draw();
+#ifdef DEBUG
+    }
+#endif
     if (auto dContext = GrAsDirectContext(canvas_->recordingContext())) {
       dContext->flushAndSubmit();
     }
@@ -171,6 +191,42 @@ void Controller::DrawRect(const float x,
                                      SkIntToScalar(w*width_),
                                      SkIntToScalar(h*width_)),
                     paint_);
+}
+
+void Controller::DrawRRectShadow(const float x,
+                                 const float y,
+                                 const float w,
+                                 const float h,
+                                 const SDL_Color &color,
+                                 const float radius,
+                                 ShadowHeights elevation) {
+  const float real_x = x * static_cast<float>(width_);
+  const float real_y = y * static_cast<float>(width_);
+  const float real_w = w * static_cast<float>(width_);
+  const float real_h = h * static_cast<float>(width_);
+  const float corner_radius = std::min(w, h) * radius * static_cast<float>(width_) / 2;
+  const float ratio = static_cast<float>(width_) / 1280;
+  for (auto [offset_y, radius_ratio, extend, alpha] :
+       std::ranges::reverse_view(shadow_properties_map[elevation].layer)) {
+    paint_.setAntiAlias(true);
+    paint_.setColor(SkColorSetARGB(static_cast<int>(alpha * 255), 0, 0, 0));
+    paint_.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, radius_ratio * ratio / 1.3f, true));
+    canvas_->save();
+    canvas_->clipRRect(
+      SkRRect::MakeRectXY(SkRect::MakeXYWH(real_x, real_y, real_w, real_h), corner_radius, corner_radius),
+      SkClipOp::kDifference,
+      true);
+    canvas_->drawRRect(SkRRect::MakeRectXY(
+                         SkRect::MakeXYWH(real_x - extend * ratio,
+                                          real_y - extend * ratio + offset_y * ratio * 1.5f,
+                                          real_w + extend * ratio * 2,
+                                          real_h + extend * ratio * 2),
+                         corner_radius,
+                         corner_radius),
+                       paint_);
+    canvas_->restore();
+    paint_.reset();
+  }
 }
 
 void Controller::DrawRRect(const float x,

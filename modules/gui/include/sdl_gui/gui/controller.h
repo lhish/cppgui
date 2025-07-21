@@ -14,6 +14,7 @@
 
 #include "events.h"
 #include "hover_checker.h"
+#include "shadow_properties.h"
 #include "ui.h"
 
 
@@ -25,7 +26,11 @@ class Controller {
 
     void Draw() const;
 
-    void StartLoop();
+    void StartLoop(
+#ifdef DEBUG
+      const std::optional<std::function<void()> > &debug_draw
+#endif
+    );
 
     ~Controller();
 
@@ -44,6 +49,14 @@ class Controller {
     void DrawRect(float x, float y, float w, float h, const SDL_Color &color);
 
     void DrawRRect(float x, float y, float w, float h, const SDL_Color &color, float radius_ratio);
+
+    void DrawRRectShadow(float x,
+                         float y,
+                         float w,
+                         float h,
+                         const SDL_Color &color,
+                         float radius,
+                         ShadowHeights elevation);
 
     [[nodiscard]] int GetWidth() const { return width_; }
 

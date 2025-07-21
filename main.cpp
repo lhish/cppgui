@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
     controller.AddObject(
         std::make_unique<Button>(UIAttributes{0.05, 0.01, 0.15, 0.2},
                                  "top_bar_button1",
-                                 SDL_Color{100, 100, 255, 255},
-                                 0.5),
+                                 SDL_Color{255, 255, 255, 255},
+                                 0),
         top_bar); // 导航按钮1
     controller.AddObject(
         std::make_unique<Button>(UIAttributes{0.25, 0.01, 0.15, 0.2},
