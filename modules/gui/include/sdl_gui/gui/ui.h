@@ -3,6 +3,7 @@
 #include <cassert>
 #include <memory>
 
+#include "ui_factory.h"
 #include "sdl_gui/common/debug.h"
 
 struct UIAttributes {
@@ -64,4 +65,5 @@ struct std::less<std::shared_ptr<UI> > {
   }
 };
 
+UI_FACTORY_REGISTER(UIType::UI, UI)
 #endif //SDL_GUI_UI_H

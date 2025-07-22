@@ -21,4 +21,5 @@ class Button : public UIGroup {
     float height_{};
 };
 
+UI_FACTORY_REGISTER(UIType::Button, Button)
 #endif //SDL_GUI_BUTTON_H

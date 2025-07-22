@@ -19,4 +19,6 @@ class UIGroup : public UI {
 
     std::set<std::shared_ptr<UI> > ui_group_;
 };
+
+UI_FACTORY_REGISTER(UIType::UIGroup, UIGroup)
 #endif //SDL_GUI_UI_GROUP_H
