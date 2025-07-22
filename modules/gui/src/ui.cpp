@@ -9,10 +9,6 @@ UI::UI(const UIAttributes &attr, std::string name, const int depth): attr_(attr)
 void UI::Click() {
 }
 
-void UI::SetUIRef(const UIRef &ref) {
-  ref_ = ref;
-}
-
 bool operator==(const UI &lhs, const UI &rhs) {
   return lhs.depth_ == rhs.depth_;
 }

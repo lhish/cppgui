@@ -1,23 +1,22 @@
-#ifndef SDL_GUI_UIGROUP_H
-#define SDL_GUI_UIGROUP_H
+#ifndef SDL_GUI_UI_GROUP_H
+#define SDL_GUI_UI_GROUP_H
 
 #include <set>
 #include "ui.h"
-#include "ui_ref.h"
 
 class UIGroup : public UI {
   public:
     UIGroup(const UIAttributes &attr,
             std::string name,
             int depth = 0,
-            const std::set<UIRef> &ui_group = {});
+            const std::set<std::shared_ptr<UI> > &ui_group = {});
 
     void Draw(const UIAttributes &offset) override;
 
-    void AddObject(const UIRef &ref) override;
+    void AddObject(const std::shared_ptr<UI> &ref) override;
 
     ~UIGroup() override;
 
-    std::set<UIRef> ui_group_;
+    std::set<std::shared_ptr<UI> > ui_group_;
 };
-#endif //SDL_GUI_UIGROUP_H
+#endif //SDL_GUI_UI_GROUP_H

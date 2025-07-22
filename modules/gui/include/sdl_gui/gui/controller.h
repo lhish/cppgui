@@ -3,18 +3,14 @@
 
 #include <SDL3/SDL.h>
 #include <memory>
-#include <vector>
 
 #include <include/core/SkCanvas.h>
 #include <include/core/SkColor.h>
 #include <include/core/SkSurface.h>
 #include <include/core/SkPaint.h>
-#include <include/gpu/ganesh/gl/GrGLInterface.h>
-#include <include/gpu/ganesh/gl/GrGLTypes.h>
 
 #include "events.h"
 #include "hover_checker.h"
-#include "shadow_properties.h"
 #include "ui.h"
 
 
@@ -40,7 +36,8 @@ class Controller {
 
     void AddTrigger(const UITriggerRef &trigger_ref);
 
-    UIRef AddObject(std::unique_ptr<UI> ui, std::optional<std::reference_wrapper<UIRef> > parent = {});
+    std::shared_ptr<UI> AddObject(const std::shared_ptr<UI> &ui,
+                                  const std::optional<std::shared_ptr<UI> > &parent = {});
 
     static SDL_Color SkColorToSDLColor(const SkColor &color);
 
@@ -70,9 +67,8 @@ class Controller {
     SkCanvas *canvas_;
     SDL_Event event_{};
     SDL_Window *window_;
-    std::optional<UIRef> basic_ui_{};
+    std::optional<std::shared_ptr<UI> > basic_ui_{};
     bool keep_going{true};
-    std::vector<std::unique_ptr<UI> > ui_group_{};
     int width_;
     int ori_width_;
     int height_;

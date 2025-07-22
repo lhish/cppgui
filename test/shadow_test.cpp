@@ -2,9 +2,7 @@
 
 #include "sdl_gui/common/magic_enum.hpp"
 #include "sdl_gui/gui/controller.h"
-//
-// Created by lhy on 25-7-21.
-//
+
 int main() {
   auto st = std::chrono::high_resolution_clock::now();
   controller.StartLoop([&]() {

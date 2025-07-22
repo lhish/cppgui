@@ -34,7 +34,7 @@ void Button::Draw(const UIAttributes &offset) {
 
   // Draw background
   controller.AddTrigger({
-    ref_, [real,this](const float x, const float y) {
+    shared_from_this(), [real,this](const float x, const float y) {
       //判断是否在圆角矩形内
       const auto width = static_cast<float>(controller.GetWidth());
       const auto radius = std::min(real->w_, real->h_) * radius_ratio_ * width / 2;

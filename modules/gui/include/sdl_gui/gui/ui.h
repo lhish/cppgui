@@ -1,8 +1,8 @@
 #ifndef SDL_GUI_UI_H
 #define SDL_GUI_UI_H
 #include <cassert>
+#include <memory>
 
-#include "ui_ref.h"
 #include "sdl_gui/common/debug.h"
 
 struct UIAttributes {
@@ -13,11 +13,13 @@ struct UIAttributes {
   float zoom_rate_{1};
 };
 
-class UI {
+class UI : public std::enable_shared_from_this<UI> {
   friend class UIRef;
   friend class Controller;
 
-  friend bool operator<(const UIRef &lhs, const UIRef &rhs);
+  friend bool operator<(const std::shared_ptr<UI> &lhs, const std::shared_ptr<UI> &rhs) {
+    return lhs->depth_ < rhs->depth_;
+  }
 
   public:
     virtual ~UI() = default;
@@ -31,11 +33,9 @@ class UI {
       return name_;
     }
 
-    virtual void AddObject(const UIRef &ref) { assertm(false, "only basic ui can't be as parent"); }
+    virtual void AddObject(const std::shared_ptr<UI> &ref) { assertm(false, "only basic ui can't be as parent"); }
 
     virtual void Click();
-
-    void SetUIRef(const UIRef &ref);
 
     friend bool operator==(const UI &lhs, const UI &rhs);
 
@@ -52,7 +52,6 @@ class UI {
   protected:
     UIAttributes attr_{};
     int depth_{}; //>=0
-    UIRef ref_{};
     std::string name_;
 };
 

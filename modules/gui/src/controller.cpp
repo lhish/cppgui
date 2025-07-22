@@ -1,7 +1,4 @@
 #include "sdl_gui/gui/controller.h"
-#include "sdl_gui/gui/controller.h"
-#include "sdl_gui/gui/controller.h"
-
 #include <cassert>
 #include <ranges>
 #include <variant>
@@ -20,6 +17,7 @@
 
 #include "SDL3/SDL_opengl.h"
 #include "sdl_gui/common/magic_enum.hpp"
+#include "sdl_gui/gui/shadow_properties.h"
 #include "sdl_gui/gui/ui_group.h"
 
 Controller &Controller::GetInstance() {
@@ -158,17 +156,12 @@ void Controller::AddTrigger(const UITriggerRef &trigger_ref) {
   hover_checker_.Add(trigger_ref);
 }
 
-UIRef Controller::AddObject(std::unique_ptr<UI> ui, const std::optional<std::reference_wrapper<UIRef> > parent) {
-  ui->depth_ += (parent ? parent->get() : *basic_ui_)->depth_ + 1;
-  ui_group_.emplace_back(std::move(ui));
-  UIRef ref{ui_group_, ui_group_.end() - 1};
-  ui_group_.back()->SetUIRef(ref);
-  if (!parent) {
-    (*basic_ui_)->AddObject(ref);
-  } else {
-    parent->get()->AddObject(ref);
-  }
-  return ref;
+std::shared_ptr<UI> Controller::AddObject(const std::shared_ptr<UI> &ui,
+                                          const std::optional<std::shared_ptr<UI> > &parent) {
+  const auto &parent_here = *(parent ? parent : basic_ui_);
+  ui->depth_ += parent_here->depth_ + 1;
+  parent_here->AddObject(ui);
+  return ui;
 }
 
 SDL_Color Controller::SkColorToSDLColor(const SkColor &color) {
@@ -298,7 +291,6 @@ Controller::Controller() {
   height_ = dm_->h;
   ori_width_ = dm_->w;
   ori_height_ = dm_->h;
-
   window_ =
       CheckSDL(SDL_CreateWindow("Hello, SDL3!", dm_->w, dm_->h, windowFlags));
 
@@ -349,6 +341,5 @@ Controller::Controller() {
 
   canvas_ = (*surface_)->getCanvas();
   paint_.setAntiAlias(true);
-  ui_group_.emplace_back(std::move(std::make_unique<UIGroup>(UIAttributes{0, 0, 1, -1}, "root")));
-  basic_ui_ = {ui_group_, ui_group_.end() - 1};
+  basic_ui_ = {std::make_shared<UIGroup>(UIAttributes{0, 0, 1, -1}, "root")};
 }

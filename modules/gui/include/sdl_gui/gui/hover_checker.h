@@ -4,15 +4,15 @@
 #include <set>
 
 #include "events.h"
-#include "ui_ref.h"
+#include "ui.h"
 
 struct UITriggerRef {
-  UIRef ref_;
+  std::shared_ptr<UI> ref_;
   std::function<bool(float x, float y)> checker_; //real
   std::function<void(float x, float y, MouseStatus &)> solver_;
 
   friend bool operator==(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return lhs.ref_ == rhs.ref_;
+    return *lhs.ref_ == *rhs.ref_;
   }
 
   friend bool operator!=(const UITriggerRef &lhs, const UITriggerRef &rhs) {
@@ -20,7 +20,7 @@ struct UITriggerRef {
   }
 
   friend bool operator<(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return lhs.ref_ < rhs.ref_;
+    return *lhs.ref_ < *rhs.ref_;
   }
 
   friend bool operator<=(const UITriggerRef &lhs, const UITriggerRef &rhs) {
