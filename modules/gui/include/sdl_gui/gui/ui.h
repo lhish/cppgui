@@ -53,6 +53,15 @@ class UI : public std::enable_shared_from_this<UI> {
     UIAttributes attr_{};
     int depth_{}; //>=0
     std::string name_;
+    int index_;
+    inline static int counter_{};
+};
+
+template<>
+struct std::less<std::shared_ptr<UI> > {
+  bool operator()(const std::shared_ptr<UI> &lhs, const std::shared_ptr<UI> &rhs) const {
+    return *lhs < *rhs;
+  }
 };
 
 #endif //SDL_GUI_UI_H
