@@ -2,85 +2,89 @@
 #define SDL_GUI_CONTROLLER_H
 
 #include <SDL3/SDL.h>
-#include <memory>
-
 #include <include/core/SkCanvas.h>
 #include <include/core/SkColor.h>
-#include <include/core/SkSurface.h>
 #include <include/core/SkPaint.h>
+#include <include/core/SkSurface.h>
 
+#include <map>
+#include <memory>
+#include <set>
+
+#include "animation.h"
+#include "button.h"
 #include "events.h"
 #include "hover_checker.h"
 #include "ui.h"
-#include"ui_group.h"
-#include "button.h"
+#include "ui_group.h"
 
 class Controller {
-  public:
-    static Controller &GetInstance();
+ public:
+  static Controller &GetInstance();
 
-    void handle_events();
+  bool handle_events();
 
-    void Draw() const;
+  void Draw() const;
 
-    void StartLoop(
+  void StartLoop(
 #ifdef DEBUG
-      const std::optional<std::function<void()> > &debug_draw = {}
+      const std::optional<std::function<void()>> &debug_draw = {}
 #endif
-    );
+  );
 
-    ~Controller();
+  ~Controller();
 
-    [[nodiscard]] std::optional<UIAttributes> CalReal(const UIAttributes &offset, const UIAttributes &self) const;
+  [[nodiscard]] std::optional<UIAttributes> CalReal(const UIAttributes &offset, const UIAttributes &self) const;
 
-    [[nodiscard]] bool CheckRange(float x, float y) const;
+  [[nodiscard]] bool CheckRange(float x, float y) const;
 
-    void AddTrigger(const UITriggerRef &trigger_ref);
+  void AddTrigger(const UITriggerRef &trigger_ref);
 
-    std::shared_ptr<UI> AddObject(const std::shared_ptr<UI> &ui,
-                                  const std::optional<std::shared_ptr<UI> > &parent = {});
+  void AddAnimation(Animation &&animation);
 
-    static SDL_Color SkColorToSDLColor(const SkColor &color);
+  std::shared_ptr<UI> AddObject(const std::shared_ptr<UI> &ui,
+                                const std::optional<std::shared_ptr<UI>> &parent = {}) const;
 
-    void SetColor(const SDL_Color &color);
+  static SDL_Color SkColorToSDLColor(const SkColor &color);
 
-    void DrawRect(float x, float y, float w, float h, const SDL_Color &color);
+  void SetColor(const SDL_Color &color);
 
-    void DrawRRect(float x, float y, float w, float h, const SDL_Color &color, float radius_ratio);
+  void DrawRect(float x, float y, float w, float h, const SDL_Color &color);
 
-    void DrawRRectShadow(float x,
-                         float y,
-                         float w,
-                         float h,
-                         const SDL_Color &color,
-                         float radius,
-                         float elevation);
+  void DrawRRect(float x, float y, float w, float h, const SDL_Color &color, float radius_ratio);
 
-    [[nodiscard]] int GetWidth() const { return width_; }
+  void DrawRRectShadow(float x, float y, float w, float h, const SDL_Color &color, float radius, float elevation);
 
-    [[nodiscard]] int GetHeight() const { return height_; }
+  [[nodiscard]] int GetWidth() const { return width_; }
 
-  private:
-    Controller();
+  [[nodiscard]] int GetHeight() const { return height_; }
 
-    uint32_t windowFlags{};
-    SDL_GLContext glContext_{};
-    SkCanvas *canvas_;
-    SDL_Event event_{};
-    SDL_Window *window_;
-    std::optional<std::shared_ptr<UI> > basic_ui_{};
-    bool keep_going{true};
-    int width_;
-    int ori_width_;
-    int height_;
-    int ori_height_;
-    SDL_DisplayID *displays_;
-    const SDL_DisplayMode *dm_;
-    SkPaint paint_{};
-    std::unique_ptr<sk_sp<SkSurface> > surface_;
-    HoverChecker hover_checker_;
-    MouseStatus mouse_down_{MouseStatus::IDLE};
+  void UpdateAnimation();
+
+  bool SolveSingleEvent(const SDL_Event &event);
+
+ private:
+  Controller();
+
+  uint32_t windowFlags{};
+  SDL_GLContext glContext_{};
+  SkCanvas *canvas_;
+  SDL_Event event_{};
+  SDL_Window *window_;
+  std::optional<std::shared_ptr<UI>> basic_ui_{};
+  bool keep_going{true};
+  int width_;
+  int ori_width_;
+  int height_;
+  int ori_height_;
+  SDL_DisplayID *displays_;
+  const SDL_DisplayMode *dm_;
+  SkPaint paint_{};
+  std::unique_ptr<sk_sp<SkSurface>> surface_;
+  HoverChecker hover_checker_;
+  std::map<std::shared_ptr<UI>, std::set<Animation>> animations_;
+  bool initialized_{};
 };
 
 inline auto &controller = Controller::GetInstance();
-#endif //SDL_GUI_CONTROLLER_H
+#endif  // SDL_GUI_CONTROLLER_H

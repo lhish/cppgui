@@ -15,4 +15,4 @@ enum class MouseStatus {
   MOUSE_MOVE,
   IDLE
 };
-#endif //EVENTS_H
+#endif  // EVENTS_H

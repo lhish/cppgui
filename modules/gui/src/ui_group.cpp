@@ -4,12 +4,9 @@
 
 #include "sdl_gui/gui/controller.h"
 
-UIGroup::UIGroup(const UIAttributes &attr,
-                 std::string name,
-                 const int depth,
-                 const std::set<std::shared_ptr<UI> > &ui_group) : UI(attr, std::move(name), depth),
-                                                                   ui_group_(ui_group) {
-}
+UIGroup::UIGroup(const UIAttributes &attr, std::string name, const int depth,
+                 const std::set<std::shared_ptr<UI> > &ui_group)
+    : UI(attr, std::move(name), depth), ui_group_(ui_group) {}
 
 void UIGroup::Draw(const UIAttributes &offset) {
   const auto real = controller.CalReal(offset, attr_);
@@ -26,8 +23,6 @@ void UIGroup::Draw(const UIAttributes &offset) {
   }
 }
 
-void UIGroup::AddObject(const std::shared_ptr<UI> &ref) {
-  ui_group_.emplace(ref);
-}
+void UIGroup::AddObject(const std::shared_ptr<UI> &ref) { ui_group_.emplace(ref); }
 
 UIGroup::~UIGroup() = default;

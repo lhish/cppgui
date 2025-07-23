@@ -8,47 +8,34 @@
 
 struct UITriggerRef {
   std::shared_ptr<UI> ref_;
-  std::function<bool(float x, float y)> checker_; //real
+  std::function<bool(float x, float y)> checker_;  // real
   std::function<void(float x, float y, MouseStatus &)> solver_;
 
-  friend bool operator==(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return *lhs.ref_ == *rhs.ref_;
-  }
+  friend bool operator==(const UITriggerRef &lhs, const UITriggerRef &rhs) { return *lhs.ref_ == *rhs.ref_; }
 
-  friend bool operator!=(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return !(lhs == rhs);
-  }
+  friend bool operator!=(const UITriggerRef &lhs, const UITriggerRef &rhs) { return !(lhs == rhs); }
 
-  friend bool operator<(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return *lhs.ref_ < *rhs.ref_;
-  }
+  friend bool operator<(const UITriggerRef &lhs, const UITriggerRef &rhs) { return *lhs.ref_ < *rhs.ref_; }
 
-  friend bool operator<=(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return !(rhs < lhs);
-  }
+  friend bool operator<=(const UITriggerRef &lhs, const UITriggerRef &rhs) { return !(rhs < lhs); }
 
-  friend bool operator>(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return rhs < lhs;
-  }
+  friend bool operator>(const UITriggerRef &lhs, const UITriggerRef &rhs) { return rhs < lhs; }
 
-  friend bool operator>=(const UITriggerRef &lhs, const UITriggerRef &rhs) {
-    return !(lhs < rhs);
-  }
+  friend bool operator>=(const UITriggerRef &lhs, const UITriggerRef &rhs) { return !(lhs < rhs); }
 };
 
 class HoverChecker {
-  public:
-    HoverChecker() = default;
+ public:
+  HoverChecker() = default;
 
-    void Add(const UITriggerRef &ref);
+  void Add(const UITriggerRef &ref);
 
-    void Solve(float x, float y, MouseStatus &mouse_status) const;
+  void Solve(float x, float y, MouseStatus &mouse_status) const;
 
-    void Clear();
+  void Clear();
 
-  private:
-    std::set<UITriggerRef> uis_;
+ private:
+  std::set<UITriggerRef> uis_;
 };
 
-
-#endif //HOVER_CHECKER_H
+#endif  // HOVER_CHECKER_H
