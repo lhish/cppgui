@@ -2,7 +2,7 @@
 
 #include "sdl_gui/gui/animation.h"
 #include "sdl_gui/gui/controller.h"
-#include "sdl_gui/gui/smooth_animator.h"
+#include "sdl_gui/gui/spring_animator.h"
 
 Button::Button(const UIAttributes &attr, std::string name, const SDL_Color &color, const float radius_ratio,
                const int depth)
@@ -56,7 +56,8 @@ void Button::Draw(const UIAttributes &offset) {
                          [this](float x, float y, const MouseStatus &mouse_status) {
                            if (mouse_status == MouseStatus::MOUSE_LEFT_DOWN) {
                              controller.AddAnimation(
-                                 {shared_from_this(), height_, std::make_unique<SmoothAnimator>(1, 10.0f)});
+                                 {shared_from_this(), attr_.x_,
+                                  SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast)});
                            }
                          }});
   controller.DrawRRectShadow(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_, height_);

@@ -70,7 +70,6 @@ void Controller::StartLoop(
 #endif
       if (!initialized_ || handle_events()) {
         UpdateAnimation();
-        LOG(INFO) << "Updating";
         initialized_ = true;
         hover_checker_.Clear();
         Draw();

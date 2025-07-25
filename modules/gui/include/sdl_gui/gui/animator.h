@@ -8,19 +8,19 @@
 
 class Animator {
  public:
-  explicit Animator(float duration);
+  explicit Animator(std::optional<float> duration);
 
-  float GetRate() const;
+  [[nodiscard]] float GetRate() const;
 
-  [[nodiscard]] bool IsFinished() const;
+  [[nodiscard]] virtual bool IsFinished() const;
 
   virtual void Update(float& value) = 0;
 
   virtual ~Animator() = default;
 
- private:
+ protected:
   std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
-  float duration_;
+  std::optional<float> duration_;
 };
 
 #endif  // ANIMATOR_H

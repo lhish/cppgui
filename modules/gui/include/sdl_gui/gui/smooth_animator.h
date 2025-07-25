@@ -9,6 +9,7 @@
 class SmoothAnimator : public Animator {
  public:
   explicit SmoothAnimator(float duration, float final);
+  bool CheckStartStatus(float& value);
 
   void Update(float& value) override;
 

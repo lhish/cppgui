@@ -7,11 +7,15 @@
 #include "glog/logging.h"
 
 SmoothAnimator::SmoothAnimator(const float duration, const float final) : Animator(duration), final_(final) {}
-void SmoothAnimator::Update(float& value) {
+bool SmoothAnimator::CheckStartStatus(float& value) {
   if (!start_status_) {
     start_status_ = value;
-    return;
+    return true;
   }
+  return false;
+}
+void SmoothAnimator::Update(float& value) {
+  if (CheckStartStatus(value)) return;
   value = *start_status_ + (final_ - *start_status_) * GetRate();
   LOG(INFO) << GetRate();
 }
