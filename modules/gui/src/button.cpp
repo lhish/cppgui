@@ -29,38 +29,42 @@ void Button::Draw(const UIAttributes &offset) {
   // }
 
   // Draw background
-  controller.AddTrigger({shared_from_this(),
-                         [real, this](const float x, const float y) {
-                           // 判断是否在圆角矩形内
-                           const auto width = static_cast<float>(controller.GetWidth());
-                           const auto radius = std::min(real->w_, real->h_) * radius_ratio_ * width / 2;
-                           const UIAttributes real1 = {real->x_ * width, real->y_ * width, real->w_ * width,
-                                                       real->h_ * width, real->zoom_rate_};
-                           return (x >= real1.x_ && x <= real1.x_ + real1.w_ && y >= real1.y_ + radius &&
-                                   y <= real1.y_ + real1.h_ - radius) ||
-                                  (x >= real1.x_ + radius && x <= real1.x_ + real1.w_ - radius && y >= real1.y_ &&
-                                   y <= real1.y_ + real1.h_) ||
-                                  ((x - (real1.x_ + radius)) * (x - (real1.x_ + radius)) +
-                                       (y - (real1.y_ + radius)) * (y - (real1.y_ + radius)) <=
-                                   radius * radius) ||
-                                  ((x - (real1.x_ + real1.w_ - radius)) * (x - (real1.x_ + real1.w_ - radius)) +
-                                       (y - (real1.y_ + radius)) * (y - (real1.y_ + radius)) <=
-                                   radius * radius) ||
-                                  ((x - (real1.x_ + radius)) * (x - (real1.x_ + radius)) +
-                                       (y - (real1.y_ + real1.h_ - radius)) * (y - (real1.y_ + real1.h_ - radius)) <=
-                                   radius * radius) ||
-                                  ((x - (real1.x_ + real1.w_ - radius)) * (x - (real1.x_ + real1.w_ - radius)) +
-                                       (y - (real1.y_ + real1.h_ - radius)) * (y - (real1.y_ + real1.h_ - radius)) <=
-                                   radius * radius);
-                         },
-                         [this](float x, float y, const MouseStatus &mouse_status) {
-                           if (mouse_status == MouseStatus::MOUSE_LEFT_DOWN) {
-                             controller.AddAnimation(
-                                 {shared_from_this(), attr_.x_,
-                                  SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast)});
-                           }
-                         }});
+  AddTrigger(real);
   controller.DrawRRectShadow(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_, height_);
   controller.DrawRRect(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_);
   UIGroup::Draw(offset);
+}
+void Button::AddTrigger(const std::optional<UIAttributes> &real) {
+  // todo: make it only work when animating
+  controller.AddTrigger(
+      shared_from_this(),
+      {[real, this](const float x, const float y) {
+         // 判断是否在圆角矩形内
+         const auto width = static_cast<float>(controller.GetWidth());
+         const auto radius = std::min(real->w_, real->h_) * radius_ratio_ * width / 2;
+         const UIAttributes real1 = {real->x_ * width, real->y_ * width, real->w_ * width, real->h_ * width,
+                                     real->zoom_rate_};
+         return (x >= real1.x_ && x <= real1.x_ + real1.w_ && y >= real1.y_ + radius &&
+                 y <= real1.y_ + real1.h_ - radius) ||
+                (x >= real1.x_ + radius && x <= real1.x_ + real1.w_ - radius && y >= real1.y_ &&
+                 y <= real1.y_ + real1.h_) ||
+                ((x - (real1.x_ + radius)) * (x - (real1.x_ + radius)) +
+                     (y - (real1.y_ + radius)) * (y - (real1.y_ + radius)) <=
+                 radius * radius) ||
+                ((x - (real1.x_ + real1.w_ - radius)) * (x - (real1.x_ + real1.w_ - radius)) +
+                     (y - (real1.y_ + radius)) * (y - (real1.y_ + radius)) <=
+                 radius * radius) ||
+                ((x - (real1.x_ + radius)) * (x - (real1.x_ + radius)) +
+                     (y - (real1.y_ + real1.h_ - radius)) * (y - (real1.y_ + real1.h_ - radius)) <=
+                 radius * radius) ||
+                ((x - (real1.x_ + real1.w_ - radius)) * (x - (real1.x_ + real1.w_ - radius)) +
+                     (y - (real1.y_ + real1.h_ - radius)) * (y - (real1.y_ + real1.h_ - radius)) <=
+                 radius * radius);
+       },
+       [this](float x, float y, const MouseInteraction &mouse_status) {
+         if (mouse_status == MouseInteraction::StopLeftClick) {
+           controller.AddAnimation({shared_from_this(), attr_.x_,
+                                    SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast)});
+         }
+       }});
 }

@@ -10,6 +10,8 @@ UI::UI(const UIAttributes &attr, std::string name, const int depth)
 
 void UI::Click() {}
 
+void UI::AddTrigger(const std::optional<UIAttributes> &real) {}
+
 bool operator==(const UI &lhs, const UI &rhs) { return lhs.index_ == rhs.index_; }
 
 bool operator!=(const UI &lhs, const UI &rhs) { return !(lhs == rhs); }

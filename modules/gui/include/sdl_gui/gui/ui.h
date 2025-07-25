@@ -35,6 +35,8 @@ class UI : public std::enable_shared_from_this<UI> {
 
   virtual void Click();
 
+  virtual void AddTrigger(const std::optional<UIAttributes> &real);
+
   friend bool operator==(const UI &lhs, const UI &rhs);
 
   friend bool operator!=(const UI &lhs, const UI &rhs);
@@ -57,8 +59,18 @@ class UI : public std::enable_shared_from_this<UI> {
 
 template <>
 struct std::less<std::shared_ptr<UI> > {
-  bool operator()(const std::shared_ptr<UI> &lhs, const std::shared_ptr<UI> &rhs) const { return *lhs < *rhs; }
+  constexpr bool operator()(const std::shared_ptr<UI> &lhs, const std::shared_ptr<UI> &rhs) const {
+    return *lhs < *rhs;
+  }
 };
-
+template <>
+struct std::less<std::weak_ptr<UI> > {
+  constexpr bool operator()(const std::weak_ptr<UI> &lhs, const std::weak_ptr<UI> &rhs) const {
+    if (!lhs.expired() && !rhs.expired()) {
+      return *lhs.lock() < *rhs.lock();
+    }
+    return lhs.lock().get() < rhs.lock().get();
+  }
+};
 UI_FACTORY_REGISTER(UIType::UI, UI)
 #endif  // SDL_GUI_UI_H

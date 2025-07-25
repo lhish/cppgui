@@ -38,7 +38,7 @@ class Controller {
 
   [[nodiscard]] bool CheckRange(float x, float y) const;
 
-  void AddTrigger(const UITriggerRef &trigger_ref);
+  void AddTrigger(const std::weak_ptr<UI> &ui, const UITriggerRef &trigger_ref);
 
   void AddAnimation(Animation &&animation);
 
@@ -82,7 +82,7 @@ class Controller {
   SkPaint paint_{};
   std::unique_ptr<sk_sp<SkSurface>> surface_;
   HoverChecker hover_checker_;
-  std::map<std::shared_ptr<UI>, std::set<Animation>> animations_;
+  std::map<std::weak_ptr<UI>, std::set<Animation>> animations_;
   bool initialized_{};
 };
 

@@ -10,6 +10,7 @@ class Button : public UIGroup {
   Button(const UIAttributes &attr, std::string name, const SDL_Color &color, float radius_ratio, int depth = 0);
 
   void Draw(const UIAttributes &offset) override;
+  void AddTrigger(const std::optional<UIAttributes> &real) override;
 
  private:
   SDL_Color color_{255, 0, 0, 255};

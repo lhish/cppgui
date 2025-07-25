@@ -21,7 +21,6 @@
 #include "sdl_gui/common/sdl_utils.h"
 #include "sdl_gui/gui/shadow_properties.h"
 #include "sdl_gui/gui/ui_group.h"
-
 Controller &Controller::GetInstance() {
   static Controller controller;
   return controller;
@@ -110,10 +109,12 @@ bool Controller::CheckRange(float x, float y) const {
   return x < 0 || x > 1 || y < 0 || y > static_cast<float>(height_) / static_cast<float>(width_);
 }
 
-void Controller::AddTrigger(const UITriggerRef &trigger_ref) { hover_checker_.Add(trigger_ref); }
+void Controller::AddTrigger(const std::weak_ptr<UI> &ui, const UITriggerRef &trigger_ref) {
+  hover_checker_.Add(ui, trigger_ref);
+}
 
 void Controller::AddAnimation(Animation &&animation) {
-  const auto animation_id = static_cast<std::shared_ptr<UI>>(animation.ui_);
+  const auto animation_id = animation.ui_;
   auto &animations = animations_[animation_id];
   if (const auto item = animations.find(animation); item != animations.end()) {
     animations.insert(std::move(animations.extract(item).value().ChangeAnimator(std::move(animation.animator_))));
@@ -259,7 +260,9 @@ bool Controller::SolveSingleEvent(const SDL_Event &event) {
       break;
     default:
       if (mouse_down_ == MouseStatus::MOUSE_MOVE) {
+        LOG(INFO) << "reseting";
         mouse_down_ = MouseStatus::IDLE;
+        hover_checker_.ResetDealing();
       }
       break;
   }
