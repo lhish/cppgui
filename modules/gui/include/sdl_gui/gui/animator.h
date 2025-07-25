@@ -18,9 +18,13 @@ class Animator {
 
   virtual ~Animator() = default;
 
+  [[nodiscard]] virtual float get_velocity() const;
+  virtual void set_velocity(float velocity);
+
  protected:
   std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
   std::optional<float> duration_;
+  float velocity_{};
 };
 
 #endif  // ANIMATOR_H

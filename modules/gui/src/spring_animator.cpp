@@ -181,7 +181,6 @@ void SpringAnimator::Update(float& value) {
   if (!start_status_) {
     start_status_ = value;
     last_s_ = value;
-    last_v_ = 0;
     last_t_ = std::chrono::high_resolution_clock::now();
     if (!duration_) {
       duration_ = EstimateTime();
@@ -206,28 +205,28 @@ void SpringAnimator::Update(float& value) {
     const double gamma_plus = r + s;
     const double gamma_minus = r - s;
 
-    const double co_eff_b = (gamma_minus * adjusted_displacement - last_v_) / (gamma_minus - gamma_plus);
+    const double co_eff_b = (gamma_minus * adjusted_displacement - velocity_) / (gamma_minus - gamma_plus);
     const double co_eff_a = adjusted_displacement - co_eff_b;
     displacement = co_eff_a * std::exp(gamma_minus * delta_t) + co_eff_b * std::exp(gamma_plus * delta_t);
     current_velocity = co_eff_a * gamma_minus * std::exp(gamma_minus * delta_t) +
                        co_eff_b * gamma_plus * std::exp(gamma_plus * delta_t);
   } else if (damping_ratio_ == 1.0f) {
     const double co_eff_a = adjusted_displacement;
-    const double co_eff_b = last_v_ + natural_freq * adjusted_displacement;
+    const double co_eff_b = velocity_ + natural_freq * adjusted_displacement;
     const double nfd_t = -natural_freq * delta_t;
     displacement = (co_eff_a + co_eff_b * delta_t) * std::exp(nfd_t);
     current_velocity = (co_eff_a + co_eff_b * delta_t) * std::exp(nfd_t) * -natural_freq + co_eff_b * std::exp(nfd_t);
   } else {
     const double damped_freq = natural_freq * std::sqrt(1 - damping_ratio_squared);
     const double cos_co_eff = adjusted_displacement;
-    const double sin_co_eff = 1 / damped_freq * (-r * adjusted_displacement + last_v_);
+    const double sin_co_eff = 1 / damped_freq * (-r * adjusted_displacement + velocity_);
     const double dfd_t = damped_freq * delta_t;
     displacement = std::exp(r * delta_t) * (cos_co_eff * std::cos(dfd_t) + sin_co_eff * std::sin(dfd_t));
     current_velocity = displacement * r + std::exp(r * delta_t) * (-damped_freq * cos_co_eff * std::sin(dfd_t) +
                                                                    damped_freq * sin_co_eff * std::cos(dfd_t));
   }
 
-  last_v_ = static_cast<float>(current_velocity);
+  velocity_ = static_cast<float>(current_velocity);
 
   last_t_ = std::chrono::high_resolution_clock::now();
   value = last_s_ = static_cast<float>(displacement) + final_;

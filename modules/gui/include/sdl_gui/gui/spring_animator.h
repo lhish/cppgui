@@ -22,9 +22,9 @@ class SpringAnimator : public Animator {
  public:
   static std::unique_ptr<Animator> Create(float final, SpringCategory spring_category,
                                           std::optional<float> duration = {});
+  // recommend not use duration
   [[deprecated("should use Create")]]
   explicit SpringAnimator(float final, float damping_ratio, float stiffness, std::optional<float> duration = {});
-  // recommend not use duration
   ~SpringAnimator() override = default;
   void Update(float& value) override;
 
@@ -49,7 +49,6 @@ class SpringAnimator : public Animator {
   float damping_ratio_;
   float visibility_threshold_{0.01f};
   float last_s_{};
-  float last_v_{};
   float ratio_{};
   std::chrono::high_resolution_clock::time_point last_t_{};
   inline static const std::unordered_map<SpringCategory, std::pair<float, float> > spring_parameters{

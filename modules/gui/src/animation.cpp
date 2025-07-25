@@ -16,3 +16,8 @@ bool Animation::Update() const {
   animator_->Update(value_->get());
   return animator_->IsFinished();
 }
+Animation& Animation::ChangeAnimator(std::unique_ptr<Animator>&& animator) {
+  animator->set_velocity(animator_->get_velocity());
+  animator_ = std::move(animator);
+  return *this;
+}

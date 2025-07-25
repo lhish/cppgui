@@ -14,6 +14,8 @@ class SmoothAnimator : public Animator {
   void Update(float& value) override;
 
   ~SmoothAnimator() override = default;
+  [[nodiscard]] float get_velocity() const override;
+  void set_velocity(float velocity) override;
 
  private:
   std::optional<float> start_status_{};

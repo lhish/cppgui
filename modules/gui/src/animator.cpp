@@ -15,3 +15,5 @@ float Animator::GetRate() const {
   return static_cast<float>((std::chrono::high_resolution_clock::now() - start_time_) / 1e9ns) / *duration_;
 }
 bool Animator::IsFinished() const { return GetRate() >= 1; }
+float Animator::get_velocity() const { return velocity_; }
+void Animator::set_velocity(const float velocity) { velocity_ = velocity; }

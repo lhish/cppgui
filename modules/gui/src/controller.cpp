@@ -113,7 +113,13 @@ bool Controller::CheckRange(float x, float y) const {
 void Controller::AddTrigger(const UITriggerRef &trigger_ref) { hover_checker_.Add(trigger_ref); }
 
 void Controller::AddAnimation(Animation &&animation) {
-  animations_[static_cast<std::shared_ptr<UI>>(animation.ui_)].emplace(std::move(animation));
+  const auto animation_id = static_cast<std::shared_ptr<UI>>(animation.ui_);
+  auto &animations = animations_[animation_id];
+  if (const auto item = animations.find(animation); item != animations.end()) {
+    animations.insert(std::move(animations.extract(item).value().ChangeAnimator(std::move(animation.animator_))));
+  } else {
+    animations.emplace(std::move(animation));
+  }
 }
 
 std::shared_ptr<UI> Controller::AddObject(const std::shared_ptr<UI> &ui,
