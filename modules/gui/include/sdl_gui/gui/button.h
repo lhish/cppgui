@@ -14,6 +14,7 @@ class Button : public UIGroup {
 
  private:
   SDL_Color color_{255, 0, 0, 255};
+  SDL_Color before_animating_color_{};
   float radius_ratio_{};
   float height_{};
 };

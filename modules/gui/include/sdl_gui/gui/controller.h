@@ -44,6 +44,7 @@ class Controller {
 
   std::shared_ptr<UI> AddObject(const std::shared_ptr<UI> &ui,
                                 const std::optional<std::shared_ptr<UI>> &parent = {}) const;
+  bool ExistAnimation(const std::weak_ptr<UI> &ui) const;
 
   static SDL_Color SkColorToSDLColor(const SkColor &color);
 
@@ -62,6 +63,8 @@ class Controller {
   void UpdateAnimation();
 
   bool SolveSingleEvent(const SDL_Event &event);
+
+  [[nodiscard]] std::pair<float, float> MousePositionChange(const std::weak_ptr<UI> &ui, float x, float y) const;
 
  private:
   Controller();

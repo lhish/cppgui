@@ -26,7 +26,7 @@ class SpringAnimator : public Animator {
   [[deprecated("should use Create")]]
   explicit SpringAnimator(float final, float damping_ratio, float stiffness, std::optional<float> duration = {});
   ~SpringAnimator() override = default;
-  void Update(float& value) override;
+  void Update(FloatNumberRef& value) override;
 
  private:
   [[nodiscard]] constexpr float EstimateTime() const;

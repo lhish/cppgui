@@ -13,6 +13,8 @@ enum class MouseStatus {
   MOUSE_RIGHT_DOWN,
   MOUSE_RIGHT_MOVE,
   MOUSE_MOVE,
-  IDLE
+  MOUSE_IDLE,
+  MOUSE_LEFT_IDLE,
+  MOUSE_RIGHT_IDLE
 };
 #endif  // EVENTS_H

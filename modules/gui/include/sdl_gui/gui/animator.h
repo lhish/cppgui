@@ -6,6 +6,8 @@
 #define ANIMATOR_H
 #include <chrono>
 
+#include "float_number_ref.h"
+
 class Animator {
  public:
   explicit Animator(std::optional<float> duration);
@@ -14,7 +16,7 @@ class Animator {
 
   [[nodiscard]] virtual bool IsFinished() const;
 
-  virtual void Update(float& value) = 0;
+  virtual void Update(FloatNumberRef& value) = 0;
 
   virtual ~Animator() = default;
 

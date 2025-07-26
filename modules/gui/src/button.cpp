@@ -9,29 +9,13 @@ Button::Button(const UIAttributes &attr, std::string name, const SDL_Color &colo
     : UIGroup(attr, std::move(name), depth, {}), color_(color), radius_ratio_(radius_ratio) {}
 
 void Button::Draw(const UIAttributes &offset) {
-  const auto real = controller.CalReal(offset, attr_);
-  if (!real) {
+  real_ = controller.CalReal(offset, attr_);
+  if (!real_) {
     return;
   }
-  // SkScalar ambient_elevation = 4.0f;
-  // SkScalar spot_elevation = 6.0f;
-
-  // if (ambient_elevation > 0 || spot_elevation > 0) {
-  // SkPath path;
-  // path.addRRect(rrect);
-  // SkShadowUtils::DrawShadow(canvas,
-  // path,
-  // SkPoint3::Make(0, 0, ambient_elevation),
-  // SkPoint3::Make(0, 0, spot_elevation),
-  // SkColorSetARGB(255, 0, 0, 0),
-  // SkColorSetARGB(128, 0, 0, 0),
-  // SkShadowFlags::kNone_ShadowFlag);
-  // }
-
-  // Draw background
-  AddTrigger(real);
-  controller.DrawRRectShadow(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_, height_);
-  controller.DrawRRect(real->x_, real->y_, real->w_, real->h_, color_, radius_ratio_);
+  AddTrigger(real_);
+  controller.DrawRRectShadow(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_, height_);
+  controller.DrawRRect(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_);
   UIGroup::Draw(offset);
 }
 void Button::AddTrigger(const std::optional<UIAttributes> &real) {
@@ -61,10 +45,41 @@ void Button::AddTrigger(const std::optional<UIAttributes> &real) {
                      (y - (real1.y_ + real1.h_ - radius)) * (y - (real1.y_ + real1.h_ - radius)) <=
                  radius * radius);
        },
-       [this](float x, float y, const MouseInteraction &mouse_status) {
-         if (mouse_status == MouseInteraction::StopLeftClick) {
-           controller.AddAnimation({shared_from_this(), attr_.x_,
-                                    SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast)});
+       [this](const float x, const float y, const MouseInteraction &mouse_status) {
+         if (mouse_status == MouseInteraction::StartHover) {
+           if (!controller.ExistAnimation(shared_from_this())) {
+             LOG(INFO) << "set_color";
+             before_animating_color_ = color_;
+           }
+           controller.AddAnimation(
+               {SpringAnimator::Create(std::max(0, color_.r - 10), SpringCategory::ExpressiveEffectsFast),
+                shared_from_this(), color_.r});
+           controller.AddAnimation(
+               {SpringAnimator::Create(std::max(0, color_.g - 10), SpringCategory::ExpressiveEffectsFast),
+                shared_from_this(), color_.g});
+           controller.AddAnimation(
+               {SpringAnimator::Create(std::max(0, color_.b - 10), SpringCategory::ExpressiveEffectsFast),
+                shared_from_this(), color_.b});
+         }
+         if (mouse_status == MouseInteraction::LeaveAreaHover) {
+           controller.AddAnimation(
+               {SpringAnimator::Create(before_animating_color_.r, SpringCategory::ExpressiveEffectsFast),
+                shared_from_this(), color_.r});
+           controller.AddAnimation(
+               {SpringAnimator::Create(before_animating_color_.g, SpringCategory::ExpressiveEffectsFast),
+                shared_from_this(), color_.g});
+           controller.AddAnimation(
+               {SpringAnimator::Create(before_animating_color_.b, SpringCategory::ExpressiveEffectsFast),
+                shared_from_this(), color_.b});
+         }
+         if (mouse_status == MouseInteraction::StartLeftClick) {
+           auto [x1, y1] = controller.MousePositionChange(shared_from_this(), x, y);
+           LOG(INFO) << "click:" << x1 << " " << y1;
+           controller.AddAnimation({
+               SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast),
+               shared_from_this(),
+               attr_.x_,
+           });
          }
        }});
 }

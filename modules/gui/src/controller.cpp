@@ -105,7 +105,7 @@ std::optional<UIAttributes> Controller::CalReal(const UIAttributes &offset, cons
   return {{x_real, y_real, w_real, h_real, final_zoom_rate}};
 }
 
-bool Controller::CheckRange(float x, float y) const {
+bool Controller::CheckRange(const float x, const float y) const {
   return x < 0 || x > 1 || y < 0 || y > static_cast<float>(height_) / static_cast<float>(width_);
 }
 
@@ -130,6 +130,7 @@ std::shared_ptr<UI> Controller::AddObject(const std::shared_ptr<UI> &ui,
   parent_here->AddObject(ui);
   return ui;
 }
+bool Controller::ExistAnimation(const std::weak_ptr<UI> &ui) const { return animations_.contains(ui); }
 
 SDL_Color Controller::SkColorToSDLColor(const SkColor &color) {
   return SDL_Color(SkColorGetR(color), SkColorGetG(color), SkColorGetB(color), SkColorGetA(color));
@@ -260,16 +261,21 @@ bool Controller::SolveSingleEvent(const SDL_Event &event) {
       break;
     default:
       if (mouse_down_ == MouseStatus::MOUSE_MOVE) {
-        LOG(INFO) << "reseting";
-        mouse_down_ = MouseStatus::IDLE;
-        hover_checker_.ResetDealing();
+        mouse_down_ = MouseStatus::MOUSE_IDLE;
+      } else if (mouse_down_ == MouseStatus::MOUSE_LEFT_MOVE) {
+        mouse_down_ = MouseStatus::MOUSE_LEFT_IDLE;
+      } else if (mouse_down_ == MouseStatus::MOUSE_RIGHT_MOVE) {
+        mouse_down_ = MouseStatus::MOUSE_RIGHT_IDLE;
       }
       break;
   }
-  if (mouse_down_ != MouseStatus::IDLE) {
-    hover_checker_.Solve(event.button.x, event.button.y, mouse_down_);
-  }
+  hover_checker_.Solve(event.button.x, event.button.y, mouse_down_);
   return ret;
+}
+std::pair<float, float> Controller::MousePositionChange(const std::weak_ptr<UI> &ui, const float x,
+                                                        const float y) const {
+  const auto &real = ui.lock()->get_real();
+  return std::make_pair(x / static_cast<float>(width_) - real.x_, y / static_cast<float>(width_) - real.y_);
 }
 
 Controller::Controller() {

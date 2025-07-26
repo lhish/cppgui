@@ -33,7 +33,7 @@ class HoverChecker {
 
   void Clear();
 
-  void ResetDealing();
+  void ResetDealing(float x, float y, const MouseStatus &mouse_status);
 
  private:
   std::map<std::weak_ptr<UI>, UITriggerRef> uis_;

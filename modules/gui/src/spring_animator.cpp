@@ -12,7 +12,8 @@ SpringAnimator::SpringAnimator(const float final, const float damping_ratio, con
   assertm(damping_ratio != 0, "damping_ratio cannot be zero");
 }
 constexpr float SpringAnimator::EstimateTime() const {
-  return EstimateAnimationDuration(stiffness_, damping_ratio_, 0, (*start_status_ - final_) / visibility_threshold_, 1);
+  return EstimateAnimationDuration(stiffness_, damping_ratio_, velocity_,
+                                   (*start_status_ - final_) / visibility_threshold_, 1);
 }
 constexpr float SpringAnimator::EstimateAnimationDuration(const double stiffness, const double damping_ratio,
                                                           const double initial_velocity,
@@ -144,8 +145,8 @@ constexpr double SpringAnimator::EstimateOverDamped(const double first_root_real
     iterations++;
     const double tLast = tCurr;
     tCurr = IterateNewtonsMethod(
-        tCurr, [&](double t) { return c1 * std::exp(r1 * t) + c2 * std::exp(r2 * t) + signedDelta; },
-        [&](double t) { return c1 * r1 * std::exp(r1 * t) + c2 * r2 * std::exp(r2 * t); });
+        tCurr, [&](const double t) { return c1 * std::exp(r1 * t) + c2 * std::exp(r2 * t) + signedDelta; },
+        [&](const double t) { return c1 * r1 * std::exp(r1 * t) + c2 * r2 * std::exp(r2 * t); });
     tDelta = std::abs(tLast - tCurr);
   }
 
@@ -177,7 +178,7 @@ std::unique_ptr<Animator> SpringAnimator::Create(float final, SpringCategory spr
   auto& [damping_ratio, stiffness] = spring_parameters.at(spring_category);
   return std::make_unique<SpringAnimator>(final, damping_ratio, stiffness, duration);
 }
-void SpringAnimator::Update(float& value) {
+void SpringAnimator::Update(FloatNumberRef& value) {
   if (!start_status_) {
     start_status_ = value;
     last_s_ = value;

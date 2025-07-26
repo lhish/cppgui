@@ -7,11 +7,11 @@
 #include "ui_factory.h"
 
 struct UIAttributes {
-  float x_{};  // 0-1 x_*width
-  float y_{};  //>0 y_*width
-  float w_{};  // 0-1 w_*width
-  float h_{};  //>0(ratio) h_*w_*width
-  float zoom_rate_{1};
+  float x_{};           // 0-1 x_*width  //相较于父元素的偏移量，值的单位是width
+  float y_{};           //>0 y_*width    //相较于父元素的偏移量，值的单位是width
+  float w_{};           // 0-1 w_*width  //宽度，值的单位是width
+  float h_{};           //>0(ratio) h_*w_*width   //高度，值的单位是w*width
+  float zoom_rate_{1};  // 通过zoom来进行整体调整
 };
 
 class UI : public std::enable_shared_from_this<UI> {
@@ -49,12 +49,15 @@ class UI : public std::enable_shared_from_this<UI> {
 
   friend bool operator>=(const UI &lhs, const UI &rhs);
 
+  const UIAttributes &get_real();
+
  protected:
   UIAttributes attr_{};
   int depth_{};  //>=0
   std::string name_;
   int index_;
   inline static int counter_{};
+  std::optional<UIAttributes> real_{};
 };
 
 template <>

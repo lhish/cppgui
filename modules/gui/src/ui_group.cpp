@@ -9,8 +9,8 @@ UIGroup::UIGroup(const UIAttributes &attr, std::string name, const int depth,
     : UI(attr, std::move(name), depth), ui_group_(ui_group) {}
 
 void UIGroup::Draw(const UIAttributes &offset) {
-  const auto real = controller.CalReal(offset, attr_);
-  if (!real) {
+  real_ = controller.CalReal(offset, attr_);
+  if (!real_) {
     return;
   }
 #ifdef DEBUG
@@ -19,7 +19,7 @@ void UIGroup::Draw(const UIAttributes &offset) {
   // controller.DrawRect(real->x_, real->y_, real->w_, real->h_, Controller::SkColorToSDLColor(color_here));
 #endif
   for (auto &ui : ui_group_) {
-    ui->Draw(*real);
+    ui->Draw(*real_);
   }
 }
 

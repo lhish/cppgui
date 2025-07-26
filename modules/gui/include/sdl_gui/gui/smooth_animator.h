@@ -9,9 +9,9 @@
 class SmoothAnimator : public Animator {
  public:
   explicit SmoothAnimator(float duration, float final);
-  bool CheckStartStatus(float& value);
+  bool CheckStartStatus(FloatNumberRef& value);
 
-  void Update(float& value) override;
+  void Update(FloatNumberRef& value) override;
 
   ~SmoothAnimator() override = default;
   [[nodiscard]] float get_velocity() const override;

@@ -11,6 +11,10 @@ UI::UI(const UIAttributes &attr, std::string name, const int depth)
 void UI::Click() {}
 
 void UI::AddTrigger(const std::optional<UIAttributes> &real) {}
+const UIAttributes &UI::get_real() {
+  assertm(real_, "real_ is nullptr");
+  return *real_;
+}
 
 bool operator==(const UI &lhs, const UI &rhs) { return lhs.index_ == rhs.index_; }
 
