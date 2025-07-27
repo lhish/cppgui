@@ -47,10 +47,9 @@ void Button::AddTrigger(const std::optional<UIAttributes> &real) {
        },
        [this](const float x, const float y, const MouseInteraction &mouse_status) {
          if (mouse_status == MouseInteraction::StartHover) {
-           if (!controller.ExistAnimation(shared_from_this())) {
-             LOG(INFO) << "set_color";
-             before_animating_color_ = color_;
-           }
+           controller.Store(color_.r);
+           controller.Store(color_.g);
+           controller.Store(color_.b);
            controller.AddAnimation(
                {SpringAnimator::Create(std::max(0, color_.r - 10), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.r});
@@ -63,13 +62,13 @@ void Button::AddTrigger(const std::optional<UIAttributes> &real) {
          }
          if (mouse_status == MouseInteraction::LeaveAreaHover) {
            controller.AddAnimation(
-               {SpringAnimator::Create(before_animating_color_.r, SpringCategory::ExpressiveEffectsFast),
+               {SpringAnimator::Create(controller.WithDraw(color_.r), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.r});
            controller.AddAnimation(
-               {SpringAnimator::Create(before_animating_color_.g, SpringCategory::ExpressiveEffectsFast),
+               {SpringAnimator::Create(controller.WithDraw(color_.g), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.g});
            controller.AddAnimation(
-               {SpringAnimator::Create(before_animating_color_.b, SpringCategory::ExpressiveEffectsFast),
+               {SpringAnimator::Create(controller.WithDraw(color_.b), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.b});
          }
          if (mouse_status == MouseInteraction::StartLeftClick) {

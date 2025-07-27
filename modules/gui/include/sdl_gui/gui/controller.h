@@ -66,6 +66,15 @@ class Controller {
 
   [[nodiscard]] std::pair<float, float> MousePositionChange(const std::weak_ptr<UI> &ui, float x, float y) const;
 
+  template <typename T>
+  void Store(T &ref);
+
+  template <typename T>
+  T WithDraw(T &ref);
+
+  template <typename T>
+  void Reset(T &ref);
+
  private:
   Controller();
 
@@ -87,7 +96,29 @@ class Controller {
   HoverChecker hover_checker_;
   std::map<std::weak_ptr<UI>, std::set<Animation>> animations_;
   bool initialized_{};
+  std::map<std::shared_ptr<FloatNumberRef>, std::any> origin_;
 };
+template <typename T>
+void Controller::Store(T &ref) {
+  const auto ref_shared = std::make_shared<FloatNumberRefT<T>>(ref);
+  if (origin_.contains(ref_shared)) {
+    return;
+  }
+  origin_[ref_shared].template emplace<T>(ref);
+}
+template <typename T>
+T Controller::WithDraw(T &ref) {
+  const auto ref_shared = std::make_shared<FloatNumberRefT<T>>(ref);
+  return std::any_cast<T>(origin_[ref_shared]);
+}
+template <typename T>
+void Controller::Reset(T &ref) {
+  const auto ref_shared = std::make_shared<FloatNumberRefT<T>>(ref);
+  if (origin_.contains(ref_shared)) {
+    return;
+  }
+  origin_.erase(ref_shared);
+}
 
 inline auto &controller = Controller::GetInstance();
 #endif  // SDL_GUI_CONTROLLER_H
