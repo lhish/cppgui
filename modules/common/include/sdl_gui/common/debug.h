@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <source_location>
+#include <thread>
 
 #include "glog/logging.h"
 #define assertm(exp, msg) assert((void(msg), exp))
@@ -45,4 +46,29 @@ class FPSTimer {
   std::chrono::high_resolution_clock::time_point start_time_;
   int count_{};
 };
+/// 运行帧率控制类
+class FpsController final {
+ public:
+  explicit FpsController(const double target_fps)
+      : frame_interval_(1e9 / target_fps), last_time_(std::chrono::high_resolution_clock::now()) {}
+  ~FpsController() = default;
+
+  void Tick();
+
+ private:
+  double frame_interval_{};
+  double actual_fps_{};
+  std::chrono::high_resolution_clock::time_point last_time_;
+};
+using std::chrono_literals::operator""ms;
+
+inline void FpsController::Tick() {
+  while (static_cast<double>((std::chrono::high_resolution_clock::now() - last_time_).count()) < frame_interval_) {
+    std::this_thread::sleep_for(1ms);
+  }
+
+  const auto current_time = std::chrono::high_resolution_clock::now();
+  actual_fps_ = 1e9 / static_cast<double>((current_time - last_time_).count());
+  last_time_ = current_time;
+}
 #endif  // SDL_GUI_DEBUG_H

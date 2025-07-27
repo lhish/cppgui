@@ -34,8 +34,13 @@ bool Controller::handle_events() {
     ret |= SolveSingleEvent(event);
     return ret;
   }
+  bool flag{};
   while (SDL_PollEvent(&event)) {
+    flag = true;
     SolveSingleEvent(event);
+  }
+  if (!flag) {
+    hover_checker_.Solve();
   }
   return true;
 }
@@ -53,7 +58,9 @@ void Controller::StartLoop(
 #endif
 ) {
   FPSTimer timer;
+  FpsController fps_controller(144);
   while (keep_going) {
+    fps_controller.Tick();
     timer.Tick();
 #ifdef DEBUG
     if (debug_draw) {
@@ -216,7 +223,7 @@ void Controller::UpdateAnimation() {
   }
 }
 bool Controller::SolveSingleEvent(const SDL_Event &event) {
-  static MouseStatus mouse_down_;
+  static MouseStatus mouse_down_{};
   bool ret{};
   switch (event.type) {
     case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
@@ -259,7 +266,7 @@ bool Controller::SolveSingleEvent(const SDL_Event &event) {
     case SDL_EVENT_QUIT:
       keep_going = false;
       break;
-    default:
+    case SDL_EVENT_WINDOW_MOUSE_LEAVE:
       if (mouse_down_ == MouseStatus::MOUSE_MOVE) {
         mouse_down_ = MouseStatus::MOUSE_IDLE;
       } else if (mouse_down_ == MouseStatus::MOUSE_LEFT_MOVE) {
@@ -267,6 +274,8 @@ bool Controller::SolveSingleEvent(const SDL_Event &event) {
       } else if (mouse_down_ == MouseStatus::MOUSE_RIGHT_MOVE) {
         mouse_down_ = MouseStatus::MOUSE_RIGHT_IDLE;
       }
+      break;
+    default:
       break;
   }
   hover_checker_.Solve(event.button.x, event.button.y, mouse_down_);

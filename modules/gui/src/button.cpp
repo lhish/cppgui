@@ -60,7 +60,8 @@ void Button::AddTrigger(const std::optional<UIAttributes> &real) {
                {SpringAnimator::Create(std::max(0, color_.b - 10), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.b});
          }
-         if (mouse_status == MouseInteraction::LeaveAreaHover) {
+         if (mouse_status == MouseInteraction::LeaveAreaHover || mouse_status == MouseInteraction::LeaveAreaLeftClick ||
+             mouse_status == MouseInteraction::LeaveAreaRightClick) {
            controller.AddAnimation(
                {SpringAnimator::Create(controller.WithDraw(color_.r), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.r});
@@ -73,7 +74,6 @@ void Button::AddTrigger(const std::optional<UIAttributes> &real) {
          }
          if (mouse_status == MouseInteraction::StartLeftClick) {
            auto [x1, y1] = controller.MousePositionChange(shared_from_this(), x, y);
-           LOG(INFO) << "click:" << x1 << " " << y1;
            controller.AddAnimation({
                SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast),
                shared_from_this(),

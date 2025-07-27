@@ -4,6 +4,8 @@
 
 #include "sdl_gui/gui/animator.h"
 
+#include "glog/logging.h"
+
 Animator::Animator(const std::optional<float> duration)
     : start_time_(std::chrono::high_resolution_clock::now()), duration_(duration) {}
 

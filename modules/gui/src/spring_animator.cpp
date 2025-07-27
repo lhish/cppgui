@@ -161,6 +161,9 @@ constexpr float SpringAnimator::EstimateDurationInternal(const double first_root
   const double v0 = (initial_position < 0) ? -initial_velocity : initial_velocity;
   const double p0 = std::abs(initial_position);
 
+  if (p0 == 0) {
+    return 0;
+  }
   double estimatedTime;
   if (damping_ratio > 1.0) {
     estimatedTime = EstimateOverDamped(first_root_real, second_root_real, p0, v0, delta);

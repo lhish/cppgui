@@ -17,7 +17,6 @@ bool SmoothAnimator::CheckStartStatus(FloatNumberRef& value) {
 void SmoothAnimator::Update(FloatNumberRef& value) {
   if (CheckStartStatus(value)) return;
   value = *start_status_ + (final_ - *start_status_) * GetRate();
-  LOG(INFO) << GetRate();
 }
 float SmoothAnimator::get_velocity() const { return (final_ - *start_status_) / *duration_; }
 void SmoothAnimator::set_velocity(float velocity) {}

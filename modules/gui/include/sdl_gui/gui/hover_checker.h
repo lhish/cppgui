@@ -29,7 +29,7 @@ class HoverChecker {
 
   void Add(const std::weak_ptr<UI> &ui, const UITriggerRef &ref);
 
-  void Solve(float x, float y, const MouseStatus &mouse_status);
+  void Solve(std::optional<float> x = {}, std::optional<float> y = {}, std::optional<MouseStatus> mouse_status = {});
 
   void Clear();
 
@@ -47,6 +47,22 @@ class HoverChecker {
       {MouseStatus::MOUSE_RIGHT_DOWN, MouseInteraction::StartRightClick},
       {MouseStatus::MOUSE_LEFT_UP, MouseInteraction::StopLeftClick},
       {MouseStatus::MOUSE_RIGHT_UP, MouseInteraction::StopRightClick}};
+  inline static const std::map<MouseStatus, MouseStatus> waiting_mouse_{
+      {MouseStatus::MOUSE_LEFT_DOWN, MouseStatus::MOUSE_LEFT_MOVE},
+      {MouseStatus::MOUSE_RIGHT_DOWN, MouseStatus::MOUSE_RIGHT_MOVE},
+      {MouseStatus::MOUSE_LEFT_MOVE, MouseStatus::MOUSE_LEFT_MOVE},
+      {MouseStatus::MOUSE_RIGHT_MOVE, MouseStatus::MOUSE_RIGHT_MOVE},
+      {MouseStatus::MOUSE_LEFT_UP, MouseStatus::MOUSE_LEFT_MOVE},
+      {MouseStatus::MOUSE_RIGHT_UP, MouseStatus::MOUSE_RIGHT_MOVE},
+      {MouseStatus::MOUSE_IDLE, MouseStatus::MOUSE_IDLE},
+      {MouseStatus::MOUSE_MOVE, MouseStatus::MOUSE_MOVE},
+      {MouseStatus::MOUSE_LEFT_IDLE, MouseStatus::MOUSE_LEFT_IDLE},
+      {MouseStatus::MOUSE_RIGHT_IDLE, MouseStatus::MOUSE_RIGHT_IDLE},
+      {MouseStatus::MOUSE_LEFT_MOVE, MouseStatus::MOUSE_LEFT_MOVE},
+      {MouseStatus::MOUSE_RIGHT_MOVE, MouseStatus::MOUSE_RIGHT_MOVE}};
+  float last_x_;
+  float last_y_;
+  MouseStatus last_mouse_status_;
 };
 
 #endif  // HOVER_CHECKER_H
