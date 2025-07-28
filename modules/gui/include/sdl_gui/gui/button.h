@@ -15,6 +15,7 @@ class Button : public Shape {
 
  private:
   float height_{1};
+  std::weak_ptr<UI> circle_;
 };
 
 UI_FACTORY_REGISTER(UIType::Button, Button)

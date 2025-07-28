@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
                                                            SDL_Color{0, 200, 200, 255}, 0.5),
                        left_panel);  // 左侧菜单项2
   // 底部状态栏区域
-  auto bottom_bar = controller.AddObject(
-      UIFactory::CreateUI<UIType::UIGroup>(UIAttributes{0.0, -0.04, 1.0, -1}, "bottom_bar"));  // 使用负y表示从底部开始
+  auto bottom_bar = controller.AddObject(UIFactory::CreateUI<UIType::UIGroup>(
+      UIAttributes{0.0, UI::FromBottomY(0.04), 1.0, -1}, "bottom_bar"));  // 使用负y表示从底部开始
   controller.AddObject(UIFactory::CreateUI<UIType::Button>(UIAttributes{0.05, 0.01, 0.2, -1}, "bottom_bar_button1",
                                                            SDL_Color{255, 150, 50, 255}, 0.5),
                        bottom_bar);  // 状态信息1

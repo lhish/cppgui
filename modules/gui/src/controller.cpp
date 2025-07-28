@@ -99,12 +99,14 @@ Controller::~Controller() {
 std::optional<UIAttributes> Controller::CalReal(const UIAttributes &offset, const UIAttributes &self) const {
   const auto final_zoom_rate = offset.zoom_rate_ * self.zoom_rate_;
   const auto x_real = self.x_ * final_zoom_rate + offset.x_;
-  const auto y_real = self.y_ >= 0 ? self.y_ * final_zoom_rate + offset.y_
-                                   : offset.h_ + self.y_ * final_zoom_rate + offset.y_;  //<0代表以左下为原点
+  const auto y_real = self.y_ < UI::from_bottom_ ? self.y_ * final_zoom_rate + offset.y_
+                                                 : offset.h_ - (self.y_ - UI::from_bottom_) * final_zoom_rate +
+                                                       offset.y_;  //>=UI::from_bottom_代表以左下为原点
   const auto w_real = self.w_ * final_zoom_rate;
   const auto h_real = self.h_ != -1  //-1代表一直延伸到底部
                           ? self.w_ * self.h_ * final_zoom_rate
-                          : self.y_ >= 0 ? offset.h_ - self.y_ * final_zoom_rate : -self.y_ * final_zoom_rate;
+                          : self.y_ < UI::from_bottom_ ? offset.h_ - self.y_ * final_zoom_rate
+                                                       : (self.y_ - UI::from_bottom_) * final_zoom_rate;
   if (CheckRange(x_real, y_real) && CheckRange(x_real, y_real + h_real) && CheckRange(x_real + w_real, h_real) &&
       CheckRange(x_real + w_real, y_real + h_real)) {
     return {};

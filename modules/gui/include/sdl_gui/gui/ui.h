@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "sdl_gui/common/debug.h"
+#include "sdl_gui/common/refl_s.h"
 #include "ui_factory.h"
 
 struct UIAttributes {
@@ -23,6 +24,9 @@ class UI : public std::enable_shared_from_this<UI> {
   }
 
  public:
+  static constexpr float from_bottom_ = 1000;
+  static float FromBottomY(float y);
+  UI() {}
   virtual ~UI() = default;
 
   UI(const UIAttributes &attr, std::string name, int depth);
@@ -54,6 +58,8 @@ class UI : public std::enable_shared_from_this<UI> {
 
   const UIAttributes &get_real();
 
+  void set_visibility(bool visibility);
+
  protected:
   UIAttributes attr_{};
   int depth_{};  //>=0
@@ -61,8 +67,9 @@ class UI : public std::enable_shared_from_this<UI> {
   int index_;
   inline static int counter_{};
   std::optional<UIAttributes> real_{};
+  bool visibility_{true};
 };
-
+REFL(UI, attr_)
 template <>
 struct std::less<std::shared_ptr<UI> > {
   constexpr bool operator()(const std::shared_ptr<UI> &lhs, const std::shared_ptr<UI> &rhs) const {

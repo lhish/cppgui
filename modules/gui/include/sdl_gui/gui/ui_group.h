@@ -7,6 +7,7 @@
 
 class UIGroup : public UI {
  public:
+  UIGroup() = default;
   UIGroup(const UIAttributes &attr, std::string name, int depth = 0,
           const std::set<std::shared_ptr<UI> > &ui_group = {});
 

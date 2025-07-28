@@ -4,13 +4,14 @@
 
 #include "sdl_gui/gui/controller.h"
 
+float UI::FromBottomY(float y) { return y + from_bottom_; }
 UI::UI(const UIAttributes &attr, std::string name, const int depth)
     : attr_(attr), depth_(depth), name_(std::move(name)) {
   counter_++;
   index_ = counter_;
 }
 void UI::Draw(const UIAttributes &offset) {
-  if (CalReal(offset)) {
+  if (visibility_ && CalReal(offset)) {
     DrawReal();
     AddTrigger();
   }
@@ -30,6 +31,7 @@ const UIAttributes &UI::get_real() {
   assertm(real_, "real_ is nullptr");
   return *real_;
 }
+void UI::set_visibility(const bool visibility) { visibility_ = visibility; }
 
 bool operator==(const UI &lhs, const UI &rhs) { return lhs.index_ == rhs.index_; }
 

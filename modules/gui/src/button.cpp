@@ -7,7 +7,12 @@
 
 Button::Button(const UIAttributes &attr, std::string name, const SDL_Color &color, const float radius_ratio,
                const int depth)
-    : Shape(attr, std::move(name), color, radius_ratio, depth) {}
+    : Shape(attr, std::move(name), color, radius_ratio, depth) {
+  circle_ =
+      *ui_group_.emplace(UIFactory::CreateUI<UIType::Shape>(attr, name + "'s circle", SDL_Color{255, 255, 255, 255}, 1))
+           .first;
+  circle_.lock()->set_visibility(false);
+}
 void Button::DrawKids() {
   controller.SaveCanvas();
   controller.AddClipRRect(real_->x_, real_->y_, real_->w_, real_->h_, radius_ratio_);
@@ -18,7 +23,6 @@ void Button::DrawSelf() {
   Shape::DrawSelf();
   controller.DrawRRectShadow(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_, height_);
 }
-
 void Button::AddTrigger() {
   // todo: make it only work when animating
   controller.AddTrigger(
@@ -76,17 +80,30 @@ void Button::AddTrigger() {
                 shared_from_this(), color_.b});
            controller.AddAnimation({std::make_unique<SmoothAnimator>(0.2, 1), shared_from_this(), height_});
          }
+         auto &circle_color = lhy::GetMember<SDL_Color>(*std::dynamic_pointer_cast<Shape>(circle_.lock()), "color_");
          if (mouse_status == MouseInteraction::StartLeftClick) {
            controller.AddAnimation({std::make_unique<SmoothAnimator>(0.2, 8), shared_from_this(), height_});
-           // auto [x1, y1] = controller.MousePositionChange(shared_from_this(), x, y);
-           // controller.AddAnimation({
-           // SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast),
-           // shared_from_this(),
-           // attr_.x_,
-           // });
+           auto [mouse_x, mouse_y] = controller.MousePositionChange(shared_from_this(), x, y);
+           auto &[circle_x, circle_y, circle_w, circle_h, circle_zoom] =
+               lhy::GetMember<UIAttributes>(*circle_.lock(), "attr_");
+           circle_x = mouse_x;
+           circle_y = mouse_y;
+           circle_w = 0;
+           circle_h = 1;
+           circle_.lock()->set_visibility(true);
+           circle_color = {255, 255, 255, 0};
+           const auto final_w = attr_.w_ * 2;
+           controller.AddAnimation(
+               {std::make_unique<SmoothAnimator>(1, circle_x - final_w / 2), shared_from_this(), circle_x});
+           controller.AddAnimation(
+               {std::make_unique<SmoothAnimator>(1, circle_y - final_w / 2), shared_from_this(), circle_y});
+           controller.AddAnimation({std::make_unique<SmoothAnimator>(1, final_w), shared_from_this(), circle_w});
+           controller.AddAnimation({std::make_unique<SmoothAnimator>(1, 80), shared_from_this(), circle_color.a});
          }
          if (mouse_status == MouseInteraction::StopLeftClick) {
            controller.AddAnimation({std::make_unique<SmoothAnimator>(0.2, 1), shared_from_this(), height_});
+           controller.AddAnimation(
+               {SpringAnimator::Create(0, SpringCategory::ExpressiveEffectsFast), shared_from_this(), circle_color.a});
          }
        }});
 }
