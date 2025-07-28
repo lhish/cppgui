@@ -50,11 +50,15 @@ class Controller {
 
   void SetColor(const SDL_Color &color);
 
-  void DrawRect(float x, float y, float w, float h, const SDL_Color &color);
-
   void DrawRRect(float x, float y, float w, float h, const SDL_Color &color, float radius_ratio);
 
+  void AddClipRRect(float x, float y, float w, float h, float radius_ratio) const;
+
   void DrawRRectShadow(float x, float y, float w, float h, const SDL_Color &color, float radius, float elevation);
+
+  void SaveCanvas() const;
+
+  void RestoreCanvas() const;
 
   [[nodiscard]] int GetWidth() const { return width_; }
 

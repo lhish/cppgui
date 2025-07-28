@@ -10,7 +10,7 @@ class UIGroup : public UI {
   UIGroup(const UIAttributes &attr, std::string name, int depth = 0,
           const std::set<std::shared_ptr<UI> > &ui_group = {});
 
-  void Draw(const UIAttributes &offset) override;
+  void DrawReal() override;
 
   void AddObject(const std::shared_ptr<UI> &ref) override;
 

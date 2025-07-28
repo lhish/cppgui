@@ -147,13 +147,6 @@ void Controller::SetColor(const SDL_Color &color) {
   paint_.setColor(SkColorSetARGB(color.a, color.r, color.g, color.b));
 }
 
-void Controller::DrawRect(const float x, const float y, const float w, const float h, const SDL_Color &color) {
-  SetColor(color);
-  canvas_->drawRect(SkRect::MakeXYWH(SkIntToScalar(x * width_), SkIntToScalar(y * width_), SkIntToScalar(w * width_),
-                                     SkIntToScalar(h * width_)),
-                    paint_);
-}
-
 void Controller::DrawRRectShadow(const float x, const float y, const float w, const float h, const SDL_Color &color,
                                  const float radius, const float elevation) {
   assertm(elevation >= 0 && elevation < 24, "elevation out of range");
@@ -194,6 +187,8 @@ void Controller::DrawRRectShadow(const float x, const float y, const float w, co
     paint_.reset();
   }
 }
+void Controller::SaveCanvas() const { canvas_->save(); }
+void Controller::RestoreCanvas() const { canvas_->restore(); }
 
 void Controller::DrawRRect(const float x, const float y, const float w, const float h, const SDL_Color &color,
                            const float radius_ratio) {
@@ -203,6 +198,12 @@ void Controller::DrawRRect(const float x, const float y, const float w, const fl
                                                           SkIntToScalar(w * width_), SkIntToScalar(h * width_)),
                                          corner_radius, corner_radius),
                      paint_);
+}
+void Controller::AddClipRRect(float x, float y, float w, float h, float radius_ratio) const {
+  const float corner_radius = std::min(w, h) * radius_ratio * static_cast<float>(width_) / 2;
+  canvas_->clipRRect(SkRRect::MakeRectXY(SkRect::MakeXYWH(SkIntToScalar(x * width_), SkIntToScalar(y * width_),
+                                                          SkIntToScalar(w * width_), SkIntToScalar(h * width_)),
+                                         corner_radius, corner_radius));
 }
 
 void Controller::UpdateAnimation() {

@@ -7,12 +7,7 @@
 UIGroup::UIGroup(const UIAttributes &attr, std::string name, const int depth,
                  const std::set<std::shared_ptr<UI> > &ui_group)
     : UI(attr, std::move(name), depth), ui_group_(ui_group) {}
-
-void UIGroup::Draw(const UIAttributes &offset) {
-  real_ = controller.CalReal(offset, attr_);
-  if (!real_) {
-    return;
-  }
+void UIGroup::DrawReal() {
 #ifdef DEBUG
   static SkRandom rand;
   static auto color_here = rand.nextU() | 0x44808080;

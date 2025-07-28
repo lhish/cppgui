@@ -2,15 +2,30 @@
 
 #include <utility>
 
+#include "sdl_gui/gui/controller.h"
+
 UI::UI(const UIAttributes &attr, std::string name, const int depth)
     : attr_(attr), depth_(depth), name_(std::move(name)) {
   counter_++;
   index_ = counter_;
 }
+void UI::Draw(const UIAttributes &offset) {
+  if (CalReal(offset)) {
+    DrawReal();
+    AddTrigger();
+  }
+}
+bool UI::CalReal(const UIAttributes &offset) {
+  real_ = controller.CalReal(offset, attr_);
+  if (!real_) {
+    return false;
+  }
+  return true;
+}
 
 void UI::Click() {}
 
-void UI::AddTrigger(const std::optional<UIAttributes> &real) {}
+void UI::AddTrigger() {}
 const UIAttributes &UI::get_real() {
   assertm(real_, "real_ is nullptr");
   return *real_;

@@ -27,7 +27,10 @@ class UI : public std::enable_shared_from_this<UI> {
 
   UI(const UIAttributes &attr, std::string name, int depth);
 
-  virtual void Draw(const UIAttributes &offset) {}
+  void Draw(const UIAttributes &offset);
+  bool CalReal(const UIAttributes &offset);
+
+  virtual void DrawReal() {};
 
   [[nodiscard]] std::string getname() const { return name_; }
 
@@ -35,7 +38,7 @@ class UI : public std::enable_shared_from_this<UI> {
 
   virtual void Click();
 
-  virtual void AddTrigger(const std::optional<UIAttributes> &real);
+  virtual void AddTrigger();
 
   friend bool operator==(const UI &lhs, const UI &rhs);
 
