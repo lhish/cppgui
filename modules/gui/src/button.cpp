@@ -2,6 +2,7 @@
 
 #include "sdl_gui/gui/animation.h"
 #include "sdl_gui/gui/controller.h"
+#include "sdl_gui/gui/smooth_animator.h"
 #include "sdl_gui/gui/spring_animator.h"
 
 Button::Button(const UIAttributes &attr, std::string name, const SDL_Color &color, const float radius_ratio,
@@ -14,6 +15,9 @@ void Button::Draw(const UIAttributes &offset) {
     return;
   }
   AddTrigger(real_);
+  if (height_ != 0) {
+    LOG(INFO) << height_;
+  }
   controller.DrawRRectShadow(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_, height_);
   controller.DrawRRect(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_);
   UIGroup::Draw(offset);
@@ -51,6 +55,8 @@ void Button::AddTrigger(const std::optional<UIAttributes> &real) {
            controller.Store(color_.g);
            controller.Store(color_.b);
            controller.AddAnimation(
+               {SpringAnimator::Create(2, SpringCategory::ExpressiveEffectsFast), shared_from_this(), height_});
+           controller.AddAnimation(
                {SpringAnimator::Create(std::max(0, color_.r - 10), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.r});
            controller.AddAnimation(
@@ -71,14 +77,19 @@ void Button::AddTrigger(const std::optional<UIAttributes> &real) {
            controller.AddAnimation(
                {SpringAnimator::Create(controller.WithDraw(color_.b), SpringCategory::ExpressiveEffectsFast),
                 shared_from_this(), color_.b});
+           controller.AddAnimation({std::make_unique<SmoothAnimator>(0.2, 1), shared_from_this(), height_});
          }
          if (mouse_status == MouseInteraction::StartLeftClick) {
-           auto [x1, y1] = controller.MousePositionChange(shared_from_this(), x, y);
-           controller.AddAnimation({
-               SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast),
-               shared_from_this(),
-               attr_.x_,
-           });
+           controller.AddAnimation({std::make_unique<SmoothAnimator>(0.2, 8), shared_from_this(), height_});
+           // auto [x1, y1] = controller.MousePositionChange(shared_from_this(), x, y);
+           // controller.AddAnimation({
+           // SpringAnimator::Create(attr_.x_ + 0.4f, SpringCategory::ExpressiveSpatialFast),
+           // shared_from_this(),
+           // attr_.x_,
+           // });
+         }
+         if (mouse_status == MouseInteraction::StopLeftClick) {
+           controller.AddAnimation({std::make_unique<SmoothAnimator>(0.2, 1), shared_from_this(), height_});
          }
        }});
 }

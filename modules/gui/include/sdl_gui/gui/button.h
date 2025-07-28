@@ -15,7 +15,7 @@ class Button : public UIGroup {
  private:
   SDL_Color color_{255, 0, 0, 255};
   float radius_ratio_{};
-  float height_{};
+  float height_{1};
 };
 
 UI_FACTORY_REGISTER(UIType::Button, Button)
