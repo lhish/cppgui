@@ -10,14 +10,12 @@ SmoothAnimator::SmoothAnimator(const float duration, const float final) : Animat
 bool SmoothAnimator::CheckStartStatus(FloatNumberRef& value) {
   if (!start_status_) {
     start_status_.emplace(value);
-    LOG(INFO) << *start_status_;
     return true;
   }
   return false;
 }
 void SmoothAnimator::Update(FloatNumberRef& value) {
   if (CheckStartStatus(value)) return;
-  LOG(INFO) << "?" << GetRate();
   value = *start_status_ + (final_ - *start_status_) * std::min(GetRate(), 1.0f);
 }
 float SmoothAnimator::get_velocity() const { return (final_ - *start_status_) / *duration_; }

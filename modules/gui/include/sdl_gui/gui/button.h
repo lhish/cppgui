@@ -3,18 +3,17 @@
 
 #include <SDL3/SDL.h>
 
-#include "ui_group.h"
+#include "shape.h"
 
-class Button : public UIGroup {
+class Button : public Shape {
  public:
   Button(const UIAttributes &attr, std::string name, const SDL_Color &color, float radius_ratio, int depth = 0);
+  void DrawKids() override;
+  void DrawSelf() override;
 
-  void DrawReal() override;
   void AddTrigger() override;
 
  private:
-  SDL_Color color_{255, 0, 0, 255};
-  float radius_ratio_{};
   float height_{1};
 };
 

@@ -7,17 +7,18 @@
 
 Button::Button(const UIAttributes &attr, std::string name, const SDL_Color &color, const float radius_ratio,
                const int depth)
-    : UIGroup(attr, std::move(name), depth, {}), color_(color), radius_ratio_(radius_ratio) {}
-
-void Button::DrawReal() {
-  controller.DrawRRect(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_);
-  controller.DrawRRectShadow(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_, height_);
-  // 有待思考要不要移动到ui_group中
+    : Shape(attr, std::move(name), color, radius_ratio, depth) {}
+void Button::DrawKids() {
   controller.SaveCanvas();
   controller.AddClipRRect(real_->x_, real_->y_, real_->w_, real_->h_, radius_ratio_);
-  UIGroup::DrawReal();
+  Shape::DrawKids();
   controller.RestoreCanvas();
 }
+void Button::DrawSelf() {
+  Shape::DrawSelf();
+  controller.DrawRRectShadow(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_, height_);
+}
+
 void Button::AddTrigger() {
   // todo: make it only work when animating
   controller.AddTrigger(

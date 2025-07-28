@@ -6,7 +6,7 @@
 #define UI_FACTORY_H
 class UI;
 
-enum class UIType { UI, UIGroup, Button };
+enum class UIType { UI, UIGroup, Button, Shape };
 
 template <UIType>
 class UITypeHelper {};
