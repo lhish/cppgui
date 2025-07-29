@@ -17,20 +17,17 @@ void UI::Draw(const UIAttributes &offset) {
   }
 }
 bool UI::CalReal(const UIAttributes &offset) {
-  real_ = controller.CalReal(offset, attr_);
-  if (!real_) {
-    return false;
+  if (const auto &real = controller.CalReal(offset, attr_); real) {
+    real_ = *real;
+    return true;
   }
-  return true;
+  return false;
 }
 
 void UI::Click() {}
 
 void UI::AddTrigger() {}
-const UIAttributes &UI::get_real() {
-  assertm(real_, "real_ is nullptr");
-  return *real_;
-}
+const UIAttributes &UI::get_real() const { return real_; }
 void UI::set_visibility(const bool visibility) { visibility_ = visibility; }
 
 bool operator==(const UI &lhs, const UI &rhs) { return lhs.index_ == rhs.index_; }

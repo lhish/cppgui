@@ -14,7 +14,6 @@
 
 #include <cassert>
 #include <ranges>
-#include <variant>
 
 #include "SDL3/SDL_opengl.h"
 #include "sdl_gui/common/magic_enum.hpp"
@@ -48,7 +47,7 @@ bool Controller::handle_events() {
 void Controller::Draw() const {
   canvas_->clear(SK_ColorWHITE);
   canvas_->translate(0, static_cast<float>(ori_height_ - height_));
-  (*basic_ui_)->Draw({0, 0, 1, static_cast<float>(height_) / static_cast<float>(width_), 1});
+  basic_ui_->Draw({0, 0, 1, static_cast<float>(height_) / static_cast<float>(width_), 1});
   canvas_->translate(0, static_cast<float>(-(ori_height_ - height_)));
 }
 
@@ -132,9 +131,8 @@ void Controller::AddAnimation(Animation &&animation) {
   }
 }
 
-std::shared_ptr<UI> Controller::AddObject(const std::shared_ptr<UI> &ui,
-                                          const std::optional<std::shared_ptr<UI>> &parent) const {
-  const auto &parent_here = *(parent ? parent : basic_ui_);
+std::shared_ptr<UI> Controller::AddObject(const std::shared_ptr<UI> &ui, const std::shared_ptr<UI> &parent) const {
+  const auto &parent_here = parent ? parent : basic_ui_;
   ui->depth_ += parent_here->depth_ + 1;
   parent_here->AddObject(ui);
   return ui;
@@ -366,5 +364,5 @@ Controller::Controller() {
 
   canvas_ = (*surface_)->getCanvas();
   paint_.setAntiAlias(true);
-  basic_ui_ = {std::make_shared<UIGroup>(UIAttributes{0, 0, 1, -1}, "root")};
+  basic_ui_ = std::make_shared<UIGroup>(UIAttributes{0, 0, 1, -1}, "root");
 }

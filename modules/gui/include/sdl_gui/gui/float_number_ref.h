@@ -24,14 +24,13 @@ class FloatNumberRef {
   operator float() const { return GetFloat(); }
   virtual ~FloatNumberRef() = default;
   virtual void* get() const = 0;
-  virtual bool has_value() = 0;
   virtual std::any GetAny() = 0;
 };
 template <typename T>
 class FloatNumberRefT : public FloatNumberRef {
  public:
-  FloatNumberRefT(T& value) : value_(value) {}
-  void* get() const override { return &value_->get(); }
+  FloatNumberRefT(T& value) : value_(std::forward<T&>(value)) {}
+  void* get() const override { return &value_; }
   ~FloatNumberRefT() override = default;
   FloatNumberRefT(const FloatNumberRefT& other) : value_(other.value_) {}
   FloatNumberRefT& operator=(const FloatNumberRefT& other) {
@@ -39,13 +38,12 @@ class FloatNumberRefT : public FloatNumberRef {
     value_ = other.value_;
     return *this;
   }
-  float GetFloat() const override { return static_cast<float>(*value_); }
-  void SetFloat(const float other) override { value_->get() = static_cast<T>(other); }
-  bool has_value() override { return value_.has_value(); }
-  std::any GetAny() override { return *value_; }
+  float GetFloat() const override { return static_cast<float>(value_); }
+  void SetFloat(const float other) override { value_ = static_cast<T>(other); }
+  std::any GetAny() override { return value_; }
 
  private:
-  std::optional<std::reference_wrapper<T>> value_;
+  T& value_;
 };
 template <>
 struct std::less<std::shared_ptr<FloatNumberRef>> {

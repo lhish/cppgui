@@ -15,13 +15,13 @@ Button::Button(const UIAttributes &attr, std::string name, const SDL_Color &colo
 }
 void Button::DrawKids() {
   controller.SaveCanvas();
-  controller.AddClipRRect(real_->x_, real_->y_, real_->w_, real_->h_, radius_ratio_);
+  controller.AddClipRRect(real_.x_, real_.y_, real_.w_, real_.h_, radius_ratio_);
   Shape::DrawKids();
   controller.RestoreCanvas();
 }
 void Button::DrawSelf() {
   Shape::DrawSelf();
-  controller.DrawRRectShadow(real_->x_, real_->y_, real_->w_, real_->h_, color_, radius_ratio_, height_);
+  controller.DrawRRectShadow(real_.x_, real_.y_, real_.w_, real_.h_, color_, radius_ratio_, height_);
 }
 void Button::AddTrigger() {
   // todo: make it only work when animating
@@ -30,9 +30,9 @@ void Button::AddTrigger() {
       {[this](const float x, const float y) {
          // 判断是否在圆角矩形内
          const auto width = static_cast<float>(controller.GetWidth());
-         const auto radius = std::min(real_->w_, real_->h_) * radius_ratio_ * width / 2;
-         const UIAttributes real1 = {real_->x_ * width, real_->y_ * width, real_->w_ * width, real_->h_ * width,
-                                     real_->zoom_rate_};
+         const auto radius = std::min(real_.w_, real_.h_) * radius_ratio_ * width / 2;
+         const UIAttributes real1 = {real_.x_ * width, real_.y_ * width, real_.w_ * width, real_.h_ * width,
+                                     real_.zoom_rate_};
          return (x >= real1.x_ && x <= real1.x_ + real1.w_ && y >= real1.y_ + radius &&
                  y <= real1.y_ + real1.h_ - radius) ||
                 (x >= real1.x_ + radius && x <= real1.x_ + real1.w_ - radius && y >= real1.y_ &&

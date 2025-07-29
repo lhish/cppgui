@@ -56,7 +56,7 @@ class UI : public std::enable_shared_from_this<UI> {
 
   friend bool operator>=(const UI &lhs, const UI &rhs);
 
-  const UIAttributes &get_real();
+  const UIAttributes &get_real() const;
 
   void set_visibility(bool visibility);
 
@@ -66,7 +66,7 @@ class UI : public std::enable_shared_from_this<UI> {
   std::string name_;
   int index_;
   inline static int counter_{};
-  std::optional<UIAttributes> real_{};
+  UIAttributes real_{};
   bool visibility_{true};
 };
 REFL(UI, attr_)

@@ -42,8 +42,7 @@ class Controller {
 
   void AddAnimation(Animation &&animation);
 
-  std::shared_ptr<UI> AddObject(const std::shared_ptr<UI> &ui,
-                                const std::optional<std::shared_ptr<UI>> &parent = {}) const;
+  std::shared_ptr<UI> AddObject(const std::shared_ptr<UI> &ui, const std::shared_ptr<UI> &parent = {}) const;
   bool ExistAnimation(const std::weak_ptr<UI> &ui) const;
 
   static SDL_Color SkColorToSDLColor(const SkColor &color);
@@ -87,7 +86,7 @@ class Controller {
   SkCanvas *canvas_;
   SDL_Event event_{};
   SDL_Window *window_;
-  std::optional<std::shared_ptr<UI>> basic_ui_{};
+  std::shared_ptr<UI> basic_ui_{};
   bool keep_going{true};
   int width_;
   int ori_width_;

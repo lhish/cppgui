@@ -20,7 +20,7 @@ void UIGroup::DrawSelf() {
 }
 void UIGroup::DrawKids() {
   for (auto &ui : ui_group_) {
-    ui->Draw(*real_);
+    ui->Draw(real_);
   }
 }
 
